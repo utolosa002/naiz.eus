@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="app_name">naiz:</string>
+    <string name="action_settings">Sartu</string>
+    <string name="drawer_open">Slider Menu Opened</string>
+    <string name="drawer_close">Slider Menu Closed</string>
+    
+    <!-- Nav Drawer Menu Items -->
+    <string-array name="nav_drawer_items">
+        <item >Info</item>
+        <item >Iritzia</item>
+        <item >naiz+</item>
+        <item >Agenda</item>
+        <item >Sailak</item>
+        <item >Blogak</item>
+        <item >Sartu</item>
+    </string-array>
+    
+    <!-- Nav Drawer List Item Icons -->
+    <!-- Keep them in order as the titles are in -->
+    <array name="nav_drawer_icons">
+        <item>@drawable/ic_home</item>
+        <item>@drawable/ic_i</item>
+        <item>@drawable/ic_n</item>
+        <item>@drawable/ic_a</item>
+        <item>@drawable/ic_s</item>
+        <item>@drawable/ic_b</item>
+        <item>@drawable/ic_s</item>
+    </array>
+    
+    <!-- Content Description -->
+    <string name="desc_list_item_icon">Item Icon</string>
+    <string name="logo">Logoa</string>
+    <string name="productos_destacados">Berri nagusiak</string>
+    <string name="products">Productos</string>
+    
+    <string name="appwidget_configure_instructions">This text will be shown before the date in our example widget.</string>
+    <string name="appwidget_prefix_default">Oh hai</string>
+    <string name="appwidget_text_format">
+        <xliff:g id="prefix">%1$s</xliff:g>: 
+        <xliff:g id="time">%2$s</xliff:g>
+    </string>
+    
+</resources>

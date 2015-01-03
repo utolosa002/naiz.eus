@@ -1,0 +1,74 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/berria"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <ScrollView
+        android:id="@+id/scrollView1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical" >
+
+        <TextView
+            android:id="@+id/textSaila"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="Saila"
+     		android:textColor="@color/urdina"
+            android:textAppearance="?android:attr/textAppearanceSmall" 
+            android:elevation="4dp"/>
+                <TextView
+            android:id="@+id/textTitularra"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="Titularra"
+      		android:padding="5dp"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+         <TextView
+             android:id="@+id/textAzpitit"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:text="Azpititulua"
+       		 android:padding="5dp"
+             android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TextView
+        android:id="@+id/textnaiz"
+        android:padding="5dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="naiz|donostia|2015"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    <ImageView
+        android:id="@+id/berrirudia"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="5dp"/>
+
+    <VideoView
+        android:id="@+id/berribidepa"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <WebView
+        android:id="@+id/berriatxt"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" 
+        android:padding="5dp"
+       	android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+        </LinearLayout>
+
+
+    </ScrollView>
+
+   
+
+</LinearLayout>

@@ -1,0 +1,20 @@
+<resources>
+
+    <!--
+        Base application theme for API 21+. This theme completely replaces
+        AppBaseTheme from res/values/styles.xml on API 11+ devices.
+    -->
+  <style name="AppBaseTheme" parent="android:Theme.Material.Light">
+        <!-- API 21 theme customizations can go here. -->
+        
+    <item name="android:colorPrimary">@color/naranja</item>
+    <!--   darker variant for the status bar and contextual app bars -->
+    <item name="android:colorPrimaryDark">@color/naranja_dark</item>
+    <!--   theme UI controls like checkboxes and text fields -->
+    <item name="android:colorAccent">@color/accent</item>
+    
+    <item name="android:navigationBarColor">@color/naranja</item>
+    
+    </style>
+
+</resources>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/berrilistaw"
+    android:background="@drawable/list_selector"
+    android:orientation="vertical"
+    android:padding="5dp" >
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="5dp" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:minWidth="80dp"
+            android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/rowsection"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="Saila"
+        android:textColor="#0000FF"
+        android:textColorHint="#0000FF"
+        android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/rowtit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="tit"
+                android:textSize="20sp" />
+            
+            <TextView
+                android:id="@+id/rowdata"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="naiz|Donostia"
+                android:textSize="15sp" />
+
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/rowimage"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="0.5"
+            android:maxWidth="40dp"
+            android:src="@drawable/ic_donde" />
+
+    </LinearLayout>
+            <TextView
+                android:id="@+id/rowsubtitle"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:textSize="14sp" />
+
+</LinearLayout>

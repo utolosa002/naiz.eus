@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widgeta"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="30dp"
+    android:background="@color/naranja_dark"
+    android:orientation="horizontal" >
+
+        <Button
+            android:id="@+id/rfsh_img"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/rfsh"
+            android:src="@drawable/rfsh" />
+    
+            <TextView
+                android:id="@+id/rfsh_tm"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="5dp"
+                android:text="eguneraketa:"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textSize="14sp" />
+
+</LinearLayout>
+<ListView
+  android:id="@+id/widget_albiste_lv"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  android:layout_marginTop="3dp"
+  android:layout_marginLeft="3dp"
+  android:layout_marginStart="3dp"
+  android:background="@drawable/myshape"
+/>
+</LinearLayout>

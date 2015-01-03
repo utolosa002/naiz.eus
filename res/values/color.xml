@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="list_item_title">#4f4d47</color>
+    <color name="list_background">#303030</color>
+    <color name="list_background_pressed">#c86b2c</color>
+    <color name="list_divider">#272727</color>
+    <color name="counter_text_bg">#c86b2c</color>
+    <color name="counter_text_color">#4f4d47</color>
+    <color name="naranja">#e87400</color>
+    <color name="naranja_orig">#c86b2c</color>
+    <color name="naranja_dark">#b04b07</color>
+    <color name="accent">#ff7a20</color>
+    <color name="urdina">#0000FF</color>
+    
+</resources>
