@@ -85,8 +85,11 @@ public class BlogBatFragment extends Fragment {
     		Document doc = null;
     		 System.out.println("searchURL: "+searchURL);
     		try {
+    			int i=0;
+    			while (i<5 && doc==null){
     			doc = Jsoup.connect(searchURL).get();
-    		
+    			i++;
+    			}
     		// Connect to the web site
 
             Elements egilea =doc.select("div[class^=author]");

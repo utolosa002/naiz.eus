@@ -16,6 +16,10 @@
         android:id="@android:id/list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingTop="5dp" />
+        android:paddingTop="5dp"
+        android:divider="@android:color/transparent"
+     	android:dividerHeight="10dp"
+		android:paddingLeft="10dip"
+		android:paddingRight="10dip" />
 
 </LinearLayout>

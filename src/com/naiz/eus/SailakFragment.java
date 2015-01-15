@@ -77,8 +77,12 @@ public class SailakFragment extends ListFragment implements OnItemClickListener 
 		    }
 	     protected Long doInBackground(URL... urls) {
    		Document doc = null;
-   		try {
-   			doc = Jsoup.connect(searchURL).get();
+   		try {	
+   			int k=0;
+		while (k<5 && doc==null){
+		doc = Jsoup.connect(searchURL).get();
+		k++;
+		}
    		// Connect to the web site
     		Elements kategoria = doc.select("div[id*=sections-menu]");
     		Elements kategoriak = kategoria.select("li");

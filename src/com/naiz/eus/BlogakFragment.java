@@ -85,8 +85,13 @@ public class BlogakFragment extends ListFragment implements OnItemClickListener 
 	     protected Long doInBackground(URL... urls) {
   		Document doc = null;
   		try {
-  			doc = Jsoup.connect(searchURL).get();
-  			// Connect to the web site
+  			int i=0;
+			while (i<5 && doc==null){
+			doc = Jsoup.connect(searchURL).get();
+			i++;
+			}
+			
+			// Connect to the web site
   			Elements izenburua = doc.select("a[class*=section]");
     		
     		if(izenburua!=null){
@@ -121,7 +126,7 @@ public class BlogakFragment extends ListFragment implements OnItemClickListener 
            bl.setPostTit(post.text());
             blogLista.add(bl);
             
-        	for (int i=0;i<blogak.size();i++) {
+        	for (i=0;i<blogak.size();i++) {
         		publishProgress((Integer)((100/blogak.size())*i));
         		 Blog b=new Blog();
                  Elements irudia2 = blogak.get(i).select("img");

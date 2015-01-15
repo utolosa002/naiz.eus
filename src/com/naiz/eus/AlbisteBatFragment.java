@@ -66,6 +66,7 @@ public class AlbisteBatFragment extends Fragment {
 //		Berriatxt.setWebViewClient(new WebViewClient());
 //		Berriatxt.setWebChromeClient(new WebChromeClient());
 		b.setBerria(b.getBerria().replaceAll("href=\"/", "href=\"http://www.naiz.eus/"));
+		b.setBerria(b.getBerria().replaceAll("src=\"/", "src=\"http://www.naiz.eus/"));
 		//TODO INTENT BERRIA SORTU BERRIAREKIN
 		String html = "<html><body style='text-align:justify;'>"+ b.getBerria()+"</body></html>";
 		Berriatxt.loadDataWithBaseURL(null, html, "text/html", "utf-8", null);
@@ -84,8 +85,11 @@ public class AlbisteBatFragment extends Fragment {
     		Document doc = null;
     		 System.out.println("searchURL: "+searchURL);
     		try {
+    			int i=0;
+    			while (i<5 && doc==null){
     			doc = Jsoup.connect(searchURL).get();
-    		
+    			i++;
+    			}
     		// Connect to the web site
     	if (doc!=null){
             Elements produktu_izenb =doc.select("div[class^=title]");

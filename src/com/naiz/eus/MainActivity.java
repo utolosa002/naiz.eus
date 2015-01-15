@@ -252,7 +252,8 @@ public class MainActivity extends FragmentActivity {
 			break;
 		case 6:
 			String link6 = "http://www.naiz.eus/eu/suscripcion/entrar";
-			fragment = new WebViewFragment(link6);
+			//fragment = new WebViewFragment(link6);
+			fragment = new HarpidetzaFragment();
 			break;
 		default:
 			break;
@@ -306,7 +307,11 @@ public class MainActivity extends FragmentActivity {
 		public void run() {
     		Document doc = null;
     		try {
+    			int i=0;
+    			while (i<5 && doc==null){
     			doc = Jsoup.connect(searchURL).get();
+    			i++;
+    			}
     		
     		// Connect to the web site <div id="login_form
     		Elements izenburua = doc.select("div[id^=login_form]");

@@ -106,8 +106,11 @@ public class AlbisteFragment extends ListFragment implements OnItemClickListener
 			 }
     		Document doc = null;
     		try {
+    			int k=0;
+    			while (k<5 && doc==null){
     			doc = Jsoup.connect(searchURL).get();
-    		
+    			k++;
+    			}
     		// Connect to the web site
     		if (titularra==""){
     		Elements izenburua = doc.select("ul[id*=nav-menu-logo]");

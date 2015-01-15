@@ -26,7 +26,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="Saila"
+        android:text="@string/saila"
         android:textColor="#0000FF"
         android:textColorHint="#0000FF"
         android:textSize="12sp" />
@@ -35,27 +35,39 @@
                 android:id="@+id/rowtit"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="tit"
+                android:text="@string/titulua"
                 android:textSize="20sp" />
             
+
+
+        </LinearLayout> </LinearLayout>
+        <ImageView
+            android:id="@+id/rowimage"
+            
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:maxHeight="180dp"
+        android:layout_weight="0.04"
+        android:scaleType="centerCrop"
+        android:layout_marginTop="2dp"
+        android:layout_marginLeft="2dp"
+        android:layout_marginRight="2dp"
+       	android:layout_marginBottom="2dp"
+        android:src="@drawable/ic_b" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+                android:background="@color/txuria"
+                android:alpha="0.5" >
             <TextView
                 android:id="@+id/rowdata"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="naiz|Donostia"
+                android:textColor="@color/beltza"
                 android:textSize="15sp" />
-
-        </LinearLayout>
-
-        <ImageView
-            android:id="@+id/rowimage"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="0.5"
-            android:maxWidth="40dp"
-            android:src="@drawable/ic_donde" />
-
-    </LinearLayout>
+</LinearLayout>
             <TextView
                 android:id="@+id/rowsubtitle"
                 android:layout_width="match_parent"
