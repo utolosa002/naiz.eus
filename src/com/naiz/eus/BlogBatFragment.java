@@ -25,7 +25,7 @@ public class BlogBatFragment extends Fragment {
 
 	private static String searchURL;
 	private Blog b=new Blog();
-
+	static WebView postTxt;
 	public BlogBatFragment(){}
 	
 	public BlogBatFragment(String link) {
@@ -42,7 +42,7 @@ public class BlogBatFragment extends Fragment {
         final TextView egilea = (TextView) rootView.findViewById(R.id.blog_egilea);
         final TextView blogIzena= (TextView) rootView.findViewById(R.id.blog_izena);
         final TextView postTit = (TextView) rootView.findViewById(R.id.blog_Post_tit);
-        final WebView postTxt = (WebView) rootView.findViewById(R.id.blog_Post_txt);
+        postTxt = (WebView) rootView.findViewById(R.id.blog_Post_txt);
         final ImageView postIrudia = (ImageView) rootView.findViewById(R.id.blog_Post_irudia);
 		
 		ThreadClass thread = new ThreadClass(this);
@@ -60,8 +60,9 @@ public class BlogBatFragment extends Fragment {
         postTit.setText(b.getPostTit());
 
 		WebSettings settings = postTxt.getSettings();
-        settings.setSupportZoom(true);
-        settings.setBuiltInZoomControls(true);
+        settings.setSupportZoom(false);
+        settings.setBuiltInZoomControls(false);
+        settings.setDefaultFontSize(MainActivity.testutamaina);
 		settings.setDefaultTextEncodingName("utf-8");
 		postTxt.getSettings().setJavaScriptEnabled(true);
 //		postTxt.setWebViewClient(new WebViewClient());

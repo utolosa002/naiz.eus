@@ -16,14 +16,15 @@ import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -31,11 +32,15 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.WebSettings;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.SeekBar;
+import android.widget.SeekBar.OnSeekBarChangeListener;
 
 @SuppressLint("NewApi")
 public class MainActivity extends FragmentActivity {
@@ -52,12 +57,12 @@ public class MainActivity extends FragmentActivity {
 	// slide menu items
 	private String[] navMenuTitles;
 	private TypedArray navMenuIcons;
-
-	private ArrayList<NavDrawerItem> navDrawerItems;
+	public static int albisteKop = 0;
+	public static ArrayList<NavDrawerItem> navDrawerItems;
 	private NavDrawerListAdapter adapter;
 	private String searchURL;
-	private String izena="sartu";
 	public static boolean hasieran;
+	public static int testutamaina=15;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -90,21 +95,8 @@ public class MainActivity extends FragmentActivity {
 		sendBroadcast(intent);
 		
 		
-		
-//		searchURL = "http://www.naiz.eus/eu/suscripcion/entrar";
-//		ThreadClass thread = new ThreadClass(this);
-//		thread.start(); 
-//		//wait for thread to finish
-//		try {
-//			thread.join();
-//		} catch (InterruptedException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//		
-		
 		// Home
-		navDrawerItems.add(new NavDrawerItem(navMenuTitles[0], navMenuIcons.getResourceId(0, -1)));
+		navDrawerItems.add(new NavDrawerItem(navMenuTitles[0], navMenuIcons.getResourceId(0, -1),true, Integer.toString(albisteKop)));
 		// Iritzia
 		navDrawerItems.add(new NavDrawerItem(navMenuTitles[1], navMenuIcons.getResourceId(1, -1), true, "50+"));
 		// naiz+
@@ -115,8 +107,10 @@ public class MainActivity extends FragmentActivity {
 		navDrawerItems.add(new NavDrawerItem(navMenuTitles[4], navMenuIcons.getResourceId(4, -1)));
 		// Blogak
 		navDrawerItems.add(new NavDrawerItem(navMenuTitles[5], navMenuIcons.getResourceId(5, -1)));
+		// Eguraldia
+		navDrawerItems.add(new NavDrawerItem(navMenuTitles[6], navMenuIcons.getResourceId(6, -1)));
 		// Sartu
-		navDrawerItems.add(new NavDrawerItem(izena, navMenuIcons.getResourceId(4, -1)));
+		navDrawerItems.add(new NavDrawerItem(navMenuTitles[7], navMenuIcons.getResourceId(4, -1)));
 		
 
 		// Recycle the typed array
@@ -174,6 +168,7 @@ public class MainActivity extends FragmentActivity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.main, menu);
+		
 		return true;
 	}
 
@@ -186,7 +181,75 @@ public class MainActivity extends FragmentActivity {
 		// Handle action bar actions click
 		switch (item.getItemId()) {
 		case R.id.action_settings:
+			CharSequence login[] = new CharSequence[] {"naiz:", "google", "facebook", "erregistratu"};
+
+			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			builder.setTitle("Login");
+			builder.setItems(login, new DialogInterface.OnClickListener() {
+			    @Override
+			    public void onClick(DialogInterface dialog, int which) {
+			    	if (which==0){
+			    	String link6 = "http://www.naiz.eus/eu/suscripcion/entrar";
+					WebViewFragment fragment = new WebViewFragment(link6);
+					//HarpidetzaFragment fragment = new HarpidetzaFragment();
+			    	FragmentManager fragmentManager = getSupportFragmentManager();
+					fragmentManager.beginTransaction()
+							.replace(R.id.frame_container, fragment).commit();
+					}
+			    }
+			});
+			builder.show();
+			
+//			searchURL = "http://www.naiz.eus/eu/suscripcion/entrar";
+//			ThreadClass thread = new ThreadClass(this);
+//			thread.start(); 
+//			//wait for thread to finish
+//			try {
+//				thread.join();
+//			} catch (InterruptedException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
 			return true;
+		case R.id.textsize_seekbar:
+			AlertDialog.Builder builder2 = new AlertDialog.Builder(this);
+			LayoutInflater inflater = MainActivity.this.getLayoutInflater();
+			View v=inflater.inflate(R.layout.global, null);
+			builder2.setView(v).setTitle(R.string.testu_tamaina_tit);
+			SeekBar sbetxtsize = (SeekBar)v.findViewById(R.id.textsize_seekbar);
+			sbetxtsize.setMax(50);
+			sbetxtsize.setProgress(testutamaina);
+			sbetxtsize.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
+				@Override
+				public void onStopTrackingTouch(SeekBar seekBar) {
+					// TODO Auto-generated method stub
+				}
+				@Override
+				public void onStartTrackingTouch(SeekBar seekBar) {
+					// TODO Auto-generated method stub
+				}
+				@Override
+				public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+					testutamaina=progress;
+					if (AlbisteBatFragment.Berriatxt!=null){
+						WebSettings settings = AlbisteBatFragment.Berriatxt.getSettings();
+		            	settings.setDefaultFontSize(MainActivity.testutamaina);
+		            }
+		            if(BlogBatFragment.postTxt!=null){
+		            	WebSettings settings = BlogBatFragment.postTxt.getSettings();
+		            	settings.setDefaultFontSize(MainActivity.testutamaina);
+		            }
+		        }
+			});
+			builder2.show();
+			return true;
+			case R.id.action_favorites:
+				AlertDialog.Builder builder3 = new AlertDialog.Builder(this);
+				LayoutInflater inflater3 = MainActivity.this.getLayoutInflater();
+				View v3=inflater3.inflate(R.layout.global, null);
+				builder3.setView(v3).setTitle("Gogokoak ikusi");
+				builder3.show();
+				return true;
 		default:
 			return super.onOptionsItemSelected(item);
 		}
@@ -200,7 +263,10 @@ public class MainActivity extends FragmentActivity {
 		// if nav drawer is opened, hide the action items
 		boolean drawerOpen = mDrawerLayout.isDrawerOpen(mDrawerList);
 		menu.findItem(R.id.action_settings).setVisible(!drawerOpen);
+	//	menu.findItem(R.menu.main).setVisible(false);
 		return super.onPrepareOptionsMenu(menu);
+
+	
 	}
 	@Override
 	public void onBackPressed() {
@@ -251,6 +317,9 @@ public class MainActivity extends FragmentActivity {
 			fragment = new BlogakFragment();
 			break;
 		case 6:
+			fragment = new EguraldiaFragment();
+			break;
+		case 7:
 			String link6 = "http://www.naiz.eus/eu/suscripcion/entrar";
 			//fragment = new WebViewFragment(link6);
 			fragment = new HarpidetzaFragment();
@@ -301,9 +370,9 @@ public class MainActivity extends FragmentActivity {
 	}
 	class ThreadClass extends Thread {
 		MainActivity   cl;
-	    public ThreadClass(MainActivity mainActivity){
-	       this.cl = mainActivity;
-	    }
+		  public ThreadClass(MainActivity mainActivity){
+		       this.cl = mainActivity;
+		    }
 		public void run() {
     		Document doc = null;
     		try {
@@ -318,12 +387,19 @@ public class MainActivity extends FragmentActivity {
 //    		System.out.println("izenb:"+izenburua.size());
     		if(!izenburua.isEmpty()){
     			System.out.println("Sartu mainActi 279");
-    			izena="Sartu";
+    		//	 Toast.makeText(getApplicationContext(),"Sartu mainActi 279", Toast.LENGTH_LONG).show();
+    			if(!(navDrawerItems==null||navDrawerItems.size()==0)){
+    				navDrawerItems.set(navDrawerItems.size()-1, new NavDrawerItem("Sartu2", R.drawable.ic_s));//navMenuIcons.getResourceId(4, -1)));
+    			}
     		}else{
+    		//	 Toast.makeText(this,"Sartu mainActi 282", Toast.LENGTH_LONG).show();
     			System.out.println("Sartu mainActi 282");
 //    			System.out.println("izenb2:"+izenburua.size());
 //    			System.out.println("izenb3:"+doc.select("input[class*=check-username-avaibility]").size());
-    			izena=doc.select("input[class*=check-username-avaibility]").first().attr("value");
+    			String loginName=doc.select("input[class*=check-username-avaibility]").first().attr("value");
+    			if(!(navDrawerItems==null||navDrawerItems.size()==0)){
+    				navDrawerItems.set(navDrawerItems.size()-1, new NavDrawerItem(loginName,  R.drawable.ic_s));
+    			}
     		}
     		} catch (IOException e1) {
     			e1.printStackTrace();

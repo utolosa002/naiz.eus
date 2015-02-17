@@ -14,10 +14,10 @@
         android:padding="5dp" >
 
         <LinearLayout
+            android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:orientation="horizontal"
-            android:padding="5dp" 
-            android:layout_width="150dp">
+            android:padding="5dp" >
 
             <ImageView
                 android:id="@+id/img_list_blog"
@@ -28,8 +28,9 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:orientation="vertical" 
-                android:layout_marginLeft="5dp">
+                android:minHeight="200dp"
+                android:minWidth="200dp"
+                android:orientation="vertical" >
 
                 <TextView
                     android:id="@+id/txt_list_blog_tit"
@@ -43,7 +44,7 @@
 
                 <TextView
                     android:id="@+id/txt_list_blog_egilea"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:text="egilea"
                     android:textSize="15sp" />
@@ -54,7 +55,7 @@
             android:id="@+id/txt_list_blog_postTit"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:minWidth="50dp"
+            android:maxWidth="200dp"
             android:text="Post titulua"
             android:textSize="18sp" />
 

@@ -31,7 +31,7 @@ import android.webkit.WebViewClient;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-public class WebViewFragment extends Fragment {
+public class EguraldiBatFragment extends Fragment {
 
 	private static String searchURL;
 	private String titulua;
@@ -39,9 +39,9 @@ public class WebViewFragment extends Fragment {
 	public TextView titView;
 	public WebView webView;
 
-	public WebViewFragment(){}
+	public EguraldiBatFragment(){}
 	
-	public WebViewFragment(String link) {
+	public EguraldiBatFragment(String link) {
 	// TODO Auto-generated constructor stub
 		 searchURL=link;
 }
@@ -62,21 +62,21 @@ public class WebViewFragment extends Fragment {
 
 
 	public static Fragment newInstance() {
-		WebViewFragment fragment = new WebViewFragment();
+		EguraldiBatFragment fragment = new EguraldiBatFragment();
         return fragment;  
 	}
 
 	public static Fragment newInstance(String link) {
-		WebViewFragment fragment = new WebViewFragment(link);
+		EguraldiBatFragment fragment = new EguraldiBatFragment(link);
         return fragment;  
 	}
 	private class AsinkTask extends AsyncTask<URL, Integer, Long> {
-		 private ProgressDialog dialog = new ProgressDialog(WebViewFragment.this.getActivity());
+		 private ProgressDialog dialog = new ProgressDialog(EguraldiBatFragment.this.getActivity());
 		 Bitmap img;
 		    @Override
 		    protected void onPostExecute(Long result) {            
 		        super.onPostExecute(result);
-		        if (WebViewFragment.this.getActivity() == null)
+		        if (EguraldiBatFragment.this.getActivity() == null)
 	                return;
 		        if (dialog.isShowing()){
 		        dialog.dismiss();
@@ -97,7 +97,7 @@ public class WebViewFragment extends Fragment {
 		    @Override
 		    protected void onPreExecute() {
 		        super.onPreExecute();
-		        dialog.setMessage("Orria lortzen...");
+		        dialog.setMessage("herriko eguraldia lortzen...");
 		    	dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 				dialog.setProgress(0);
 				dialog.setMax(100);
@@ -127,26 +127,26 @@ public class WebViewFragment extends Fragment {
 	    			}
 	    		
 	    		// Connect to the web site
-	    		Elements izenburua = doc.select("title");
-	    		titulua=izenburua.text();//lista osoaren titulua ezarri
-	    		System.out.println("titulua: "+titulua);
-	//sekzioak bakarrik hautatzeko:
-	           // Elements contain = doc.select("div[id*=content-section]");
-	           // html=contain.outerHtml();
-	    		html=doc.html();
-	            System.out.println("html: "+html);
-          
-  		} catch (IOException e1) {
-  			e1.printStackTrace();
-     			System.out.println("errorea albisteak lortzean");
+		    		Elements izenburua = doc.select("title");
+		    		titulua=izenburua.text();//lista osoaren titulua ezarri
+	    			Elements taula = doc.select("div[class*=tiempo-tabla]");
+		    		
+	    		    Elements headerra = doc.select("head");
+		            //headerra.append("<LINK href=\"styles.css\" type=\"text/css\" rel=\"stylesheet\"/>");
+		            String header=headerra.outerHtml();
+		            html=taula.outerHtml();
+		            html="<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"eu\" lang=\"eu\">"+header+"<body><div class=\"tiempo\"><div class=\"span-14\"><div class=\"tiempo-detalle\">"+html+"</div></div></div></body></html>";
+		           // System.out.println(html);
+	    		} catch (IOException e1) {
+	    		e1.printStackTrace();
+	    		System.out.println("errorea albisteak lortzean");
      			try {
-  				doInBackground(new URL(null));
-  			} catch (IOException e) {
-  				// TODO Auto-generated catch block
-  				System.out.println("errorea albisteak lortzean2");
-  				e.printStackTrace();
-  			}
-  		}
+     				doInBackground(new URL(null));
+  				} catch (IOException e) {// TODO Auto-generated catch block
+  					System.out.println("errorea albisteak lortzean2");
+  					e.printStackTrace();
+  				}
+     		}
 			return null;
 	     }
 	  

@@ -86,7 +86,7 @@ public class BlogakFragment extends ListFragment implements OnItemClickListener 
   		Document doc = null;
   		try {
   			int i=0;
-			while (i<5 && doc==null){
+			while (i<30 && doc==null){
 			doc = Jsoup.connect(searchURL).get();
 			i++;
 			}

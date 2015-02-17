@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="app_name">naiz:</string>
-    <string name="action_settings">Sartu</string>
-    
+    <string name="login_menu">Sartu</string>
+    <string name="favorites_menu">Gogokoak</string>
+    <string name="testu_tamaina_tit">Aldatu testu tamaina</string>
+    <string name="testsize_menu">Testu tamaina</string>
+    <string name="share">Partekatu</string>
     <!-- Nav Drawer Menu Items -->
     <string-array name="nav_drawer_items">
         <item >Info</item>
@@ -11,7 +14,18 @@
         <item >Agenda</item>
         <item >Sailak</item>
         <item >Blogak</item>
+        <item >Eguraldia</item>
         <item >Sartu</item>
+    </string-array>
+    
+    <string-array name="herrialdespinnerItems">
+    <item>Araba</item>
+    <item>Bizkaia</item>
+    <item>Gipuzkoa</item>
+    <item>Lapurdi</item>
+    <item>Nafarroa</item>
+    <item>Nafarroa Behera</item>
+    <item>Zuberoa</item>
     </string-array>
     
     <!-- Nav Drawer List Item Icons -->
@@ -23,6 +37,7 @@
         <item>@drawable/ic_a</item>
         <item>@drawable/ic_s</item>
         <item>@drawable/ic_b</item>
+        <item>@drawable/ic_e</item>
         <item>@drawable/ic_s</item>
     </array>
     

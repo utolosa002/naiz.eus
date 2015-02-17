@@ -60,8 +60,12 @@ public class SailakFragment extends ListFragment implements OnItemClickListener 
 		 private ProgressDialog dialog = new ProgressDialog(SailakFragment.this.getActivity());
 		    @Override
 		    protected void onPostExecute(Long result) {            
-		        super.onPostExecute(result);
+		        super.onPostExecute(result);   
+		        if (SailakFragment.this.getActivity() == null)
+	                return;
+		        if (dialog.isShowing()){
 		        dialog.dismiss();
+		        }
 		        SailListAdapter adapter = new SailListAdapter(getActivity(), sailLista);
 		        setListAdapter(adapter);
 		        if(SailakFragment.this.isVisible()){
@@ -76,47 +80,85 @@ public class SailakFragment extends ListFragment implements OnItemClickListener 
 		        dialog.show();
 		    }
 	     protected Long doInBackground(URL... urls) {
-   		Document doc = null;
-   		try {	
-   			int k=0;
-		while (k<5 && doc==null){
-		doc = Jsoup.connect(searchURL).get();
-		k++;
-		}
-   		// Connect to the web site
-    		Elements kategoria = doc.select("div[id*=sections-menu]");
-    		Elements kategoriak = kategoria.select("li");
-                  
-        	for (int i=0;i<kategoriak.size();i++) {
-        		String Kategoria_izenb = kategoriak.get(i).text();
-        		Elements Kategoria_link = kategoriak.get(i).select("a");
-                Saila s=new Saila();
-        		String text_k_link = Kategoria_link.attr("href");
-        		s.setTit(Kategoria_izenb);
-        		if(text_k_link.length()>1){
-    				if(text_k_link.startsWith("/")){
-    					text_k_link="http://www.naiz.eus"+text_k_link;
-    				}
-    			}
-        		s.setLink(text_k_link);
-        		sailLista.add(s);
-            }
-        
-   		} catch (IOException e1) {
-   			e1.printStackTrace();
-   			System.out.println("errorea sailak lortzean");
-   			try {
-				doInBackground(new URL(null));
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				System.out.println("errorea sailak lortzean2");
-				e.printStackTrace();
-			}
-//   			AsinkTask thread = new AsinkTask();
-//   			dialog.dismiss();
-//   			URL url = null;
-//   			thread.execute(url);
-   		}
+//   		Document doc = null;
+//   		try {	
+//   			int k=0;
+//		while (k<50 && doc==null){
+//		doc = Jsoup.connect(searchURL).get();
+//		k++;
+//		}
+//		if (doc!=null){
+//   		// Connect to the web site
+//    		Elements kategoria = doc.select("div[id*=sections-menu]");
+//    		Elements kategoriak = kategoria.select("li");
+//                  
+//        	for (int i=0;i<kategoriak.size();i++) {
+//        		String Kategoria_izenb = kategoriak.get(i).text();
+//        		Elements Kategoria_link = kategoriak.get(i).select("a");
+//                Saila s=new Saila();
+//        		String text_k_link = Kategoria_link.attr("href");
+//        		s.setTit(Kategoria_izenb);
+//        		if(text_k_link.length()>1){
+//    				if(text_k_link.startsWith("/")){
+//    					text_k_link="http://www.naiz.eus"+text_k_link;
+//    				}
+//    			}
+//        		s.setLink(text_k_link);
+//        		sailLista.add(s);
+//            }
+//		}else{
+			//
+			Saila s0=new Saila();
+			s0.setTit("Euskal Herria");
+			s0.setLink("http://www.naiz.eus/eu/actualidad/euskal-herria");
+			sailLista.add(s0);
+			//
+			Saila s1=new Saila();
+			s1.setTit("Zientzia");
+			s1.setLink("http://www.naiz.eus/eu/actualidad/zientzia");
+			sailLista.add(s1);
+			//
+			Saila s2=new Saila();
+			s2.setTit("Ekonomia");
+			s2.setLink("http://www.naiz.eus/eu/actualidad/ekonomia");
+			sailLista.add(s2);
+			//
+			Saila s3=new Saila();
+			s3.setTit("Kirolak");
+			s3.setLink("http://www.naiz.eus/eu/actualidad/kirolak");
+			sailLista.add(s3);
+			//
+			Saila s4=new Saila();
+			s4.setTit("Kultura");
+			s4.setLink("http://www.naiz.eus/eu/actualidad/kultura");
+			sailLista.add(s4);
+			//
+			Saila s5=new Saila();
+			s5.setTit("Mundua");
+			s5.setLink("http://www.naiz.eus/eu/actualidad/mundua");
+			sailLista.add(s5);	
+			//
+			Saila s6=new Saila();
+			s6.setTit("Teknologia");
+			s6.setLink("http://www.naiz.eus/eu/actualidad/teknologia");
+			sailLista.add(s6);
+			
+//		}
+//   		} catch (IOException e1) {
+//   			e1.printStackTrace();
+//   			System.out.println("errorea sailak lortzean");
+//   			try {
+//				doInBackground(new URL(null));
+//			} catch (IOException e) {
+//				// TODO Auto-generated catch block
+//				System.out.println("errorea sailak lortzean2");
+//				e.printStackTrace();
+//			}
+////   			AsinkTask thread = new AsinkTask();
+////   			dialog.dismiss();
+////   			URL url = null;
+////   			thread.execute(url);
+//   		}
 			return null;
 	     }
 	     @Override

@@ -14,6 +14,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import com.naiz.eus.R;
 import com.naiz.eus.adapter.BerriaListAdapter;
 import com.naiz.eus.model.Berria;
+import com.naiz.eus.model.NavDrawerItem;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -32,9 +33,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 public class AlbisteFragment extends ListFragment implements OnItemClickListener {
-	private String searchURL="http://www.naiz.eus/";
+	private String searchURL = "http://www.naiz.eus/";
 	private ArrayList<Berria> berriLista;
-	private String titularra="";
+	private String titularra = "";
 	private ImageView logoa; 
 	private TextView TitView;
 	
@@ -65,8 +66,11 @@ public class AlbisteFragment extends ListFragment implements OnItemClickListener
 		    @Override
 		    protected void onPostExecute(Long result) {            
 		        super.onPostExecute(result);
+		        if (AlbisteFragment.this.getActivity() == null)
+	                return;
+		        if (dialog.isShowing()){
 		        dialog.dismiss();
-		       
+		        }
 		        BerriaListAdapter adapter = new BerriaListAdapter(getActivity(), berriLista);
 		        setListAdapter(adapter);
 		        if(AlbisteFragment.this.isVisible()){
@@ -107,7 +111,7 @@ public class AlbisteFragment extends ListFragment implements OnItemClickListener
     		Document doc = null;
     		try {
     			int k=0;
-    			while (k<5 && doc==null){
+    			while (k<30 && doc==null){
     			doc = Jsoup.connect(searchURL).get();
     			k++;
     			}
@@ -117,51 +121,56 @@ public class AlbisteFragment extends ListFragment implements OnItemClickListener
     		Elements titu = izenburua.select("li");
     		titularra=titu.get(0).text();//lista osoaren titulua ezarri
     		}
-            Elements produktuak = doc.select("div.article");
+            Elements albisteak = doc.select("div.article");
+            //menuan kopurua ezarri
+            if(AlbisteFragment.this.isVisible()){
+            String[] navMenuTitles = getResources().getStringArray(R.array.nav_drawer_items);
+            MainActivity.navDrawerItems.set(0, new NavDrawerItem(navMenuTitles[0], R.drawable.ic_home, true, (Integer.toString(albisteak.size()))));
+            MainActivity.albisteKop=albisteak.size();
+            }
             
-            
-        	for (int i=0;i<produktuak.size();i++) {
-        		publishProgress((Integer)((100/produktuak.size())*i));
-                Elements produktu_izenb = produktuak.get(i).select("div[class*=title]");
-                Elements produktu_desk = produktuak.get(i).select("div[class*=abstract]");
-                Elements albiste_info = produktuak.get(i).select("div[class*=extra-info]");
-                Elements albiste_saila = produktuak.get(i).select("span[class*=section]");
-                Elements produktu_irudiak = produktuak.get(i).select("img");
+        	for (int i=0;i<albisteak.size();i++) {
+        		publishProgress((Integer)((100/albisteak.size())*i));
+                Elements albiste_izenb =albisteak.get(i).select("div[class*=title]");
+                Elements albiste_desk = albisteak.get(i).select("div[class*=abstract]");
+                Elements albiste_info = albisteak.get(i).select("div[class*=extra-info]");
+                Elements albiste_saila = albisteak.get(i).select("span[class*=section]");
+                Elements albiste_irudiak = albisteak.get(i).select("img");
                 Berria p=new Berria();
-        		String text_p_izena="";
-        		if(produktu_izenb.first()!=null){
-        			text_p_izena = produktu_izenb.first().text();
+        		String text_a_izena="";
+        		if(albiste_izenb.first()!=null){
+        			text_a_izena = albiste_izenb.first().text();
         			}
-        		p.setTitle(text_p_izena);
-        		String produktu_linka="";
+        		p.setTitle(text_a_izena);
+        		String albiste_linka="";
         		String weba="";
-        		Elements produktu_linkak=produktu_izenb.select("a");
-        		if(produktu_izenb.first()!=null){
-        			produktu_linka = produktu_linkak.first().attr("href");
-        			if(produktu_linka.length()>1){
-        				if(produktu_linka.startsWith("/")){
+        		Elements albiste_linkak=albiste_izenb.select("a");
+        		if(albiste_izenb.first()!=null){
+        			albiste_linka = albiste_linkak.first().attr("href");
+        			if(albiste_linka.length()>1){
+        				if(albiste_linka.startsWith("/")){
         					weba="http://www.naiz.eus";
         				}
         			}
-					p.setLink(weba+produktu_linka);
+					p.setLink(weba+albiste_linka);
         		}
  
-        		String text_produktu_desk="";
-        		if(produktu_desk.first()!=null){
-        		text_produktu_desk = produktu_desk.first().text();
+        		String text_albiste_desk="";
+        		if(albiste_desk.first()!=null){
+        		text_albiste_desk = albiste_desk.first().text();
         		}
-        		p.setSubtitle(text_produktu_desk);
-        		String produktu_irudia="";
-        		if(produktu_irudiak.first()!=null){
+        		p.setSubtitle(text_albiste_desk);
+        		String albiste_irudia="";
+        		if(albiste_irudiak.first()!=null){
         			
-        			produktu_irudia	= produktu_irudiak.first().attr("src");
-        			if (produktu_irudia.startsWith("/")){
-        				produktu_irudia="http://www.naiz.eus"+produktu_irudia;
+        			albiste_irudia	= albiste_irudiak.first().attr("src");
+        			if (albiste_irudia.startsWith("/")){
+        				albiste_irudia="http://www.naiz.eus"+albiste_irudia;
         			}
-        			Bitmap bm = MainActivity.getBitmapFromURL(produktu_irudia);
+        			Bitmap bm = MainActivity.getBitmapFromURL(albiste_irudia);
             		p.setImage(bm);
         		}
-        		Bitmap bm = MainActivity.getBitmapFromURL(produktu_irudia);
+        		Bitmap bm = MainActivity.getBitmapFromURL(albiste_irudia);
         		p.setImage(bm);
         		
         		String Info= albiste_info.text();
@@ -182,10 +191,10 @@ public class AlbisteFragment extends ListFragment implements OnItemClickListener
         					weba="http://www.naiz.eus";
         				}
         			}
-					p.setSailLinka(weba+produktu_linka);
+					p.setSailLinka(weba+albiste_linka);
         		}
         		berriLista.add(p);
-              System.out.println("linka: "+p.getLink()+" desk: "+p.getSubtitle()+" irudia: "+produktu_irudia+" saila:"+p.getSaila());
+            //  System.out.println("linka: "+p.getLink()+" desk: "+p.getSubtitle()+" irudia: "+albiste_irudia+" saila:"+p.getSaila());
             //  Toast.makeText(getActivity().getApplicationContext(),"partido "+spartido,Toast.LENGTH_SHORT).show();
             }
     		} catch (IOException e1) {

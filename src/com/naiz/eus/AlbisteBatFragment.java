@@ -1,7 +1,6 @@
 package com.naiz.eus;
 
 import java.io.IOException;
-
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
@@ -19,11 +18,11 @@ import android.webkit.WebView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-public class AlbisteBatFragment extends Fragment {
+public class AlbisteBatFragment extends Fragment{
 
 	private static String searchURL;
 	private Berria b=new Berria();
-
+	public static WebView Berriatxt;
 	public AlbisteBatFragment(){}
 	
 	public AlbisteBatFragment(String link) {
@@ -38,11 +37,12 @@ public class AlbisteBatFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.berri_bat, container, false);
         final TextView Saila = (TextView) rootView.findViewById(R.id.textSaila);
         final TextView Azpitit = (TextView) rootView.findViewById(R.id.textAzpitit);
-        final WebView Berriatxt= (WebView) rootView.findViewById(R.id.berriatxt);
+        Berriatxt= (WebView) rootView.findViewById(R.id.berriatxt);
         final TextView ExtraInfo = (TextView) rootView.findViewById(R.id.textnaiz);
         final TextView Titularra = (TextView) rootView.findViewById(R.id.textTitularra);
         final ImageView Irudia = (ImageView) rootView.findViewById(R.id.berrirudia);
-		
+    
+        
 		ThreadClass thread = new ThreadClass(this);
 		thread.start(); 
 		//wait for thread to finish
@@ -58,9 +58,10 @@ public class AlbisteBatFragment extends Fragment {
 		ExtraInfo.setText(b.getExtraInfo());
 		
 		WebSettings settings = Berriatxt.getSettings();
-        settings.setSupportZoom(true);
-        settings.setBuiltInZoomControls(true);
+        settings.setSupportZoom(false);
+        settings.setBuiltInZoomControls(false);
 		settings.setDefaultTextEncodingName("utf-8");
+		settings.setDefaultFontSize(MainActivity.testutamaina);
 		Berriatxt.getSettings().setJavaScriptEnabled(true);
 		Berriatxt.setBackgroundColor(Color.TRANSPARENT);
 //		Berriatxt.setWebViewClient(new WebViewClient());
@@ -73,6 +74,7 @@ public class AlbisteBatFragment extends Fragment {
 		
 		//Berria.setText(b.getBerria());
 		Irudia.setImageBitmap(b.getImage());
+
         return rootView;
         
     }
@@ -86,7 +88,7 @@ public class AlbisteBatFragment extends Fragment {
     		 System.out.println("searchURL: "+searchURL);
     		try {
     			int i=0;
-    			while (i<5 && doc==null){
+    			while (i<50 && doc==null){
     			doc = Jsoup.connect(searchURL).get();
     			i++;
     			}
@@ -97,7 +99,8 @@ public class AlbisteBatFragment extends Fragment {
             Elements albiste_info = doc.select("div[class*=extra-info]");
             Elements albiste_saila = doc.select("span[class=section]");
             Elements irudidiv = doc.select("div[class*=big-photo]");
-            Elements berria = doc.select("div[class*=report-text]");
+            Elements berriaNaiz = doc.select("div[class*=report-text]");
+            Elements berriaGara = doc.select("div[class*=ART_BODY]");
             Elements produktu_irudiak = irudidiv.select("img");
             
     		String text_p_izena="";
@@ -154,8 +157,10 @@ public class AlbisteBatFragment extends Fragment {
 				b.setSailLinka(weba+produktu_linka);
     		}
     		String html_berria="";
-    		if(berria.first()!=null){
-    			html_berria = berria.first().outerHtml();;
+    		if(berriaNaiz.first()!=null){
+    			html_berria = berriaNaiz.first().outerHtml();
+    		}else if(berriaGara.first()!=null){
+    			html_berria = berriaGara.first().outerHtml();
     		}
     		b.setBerria(html_berria);
     		}

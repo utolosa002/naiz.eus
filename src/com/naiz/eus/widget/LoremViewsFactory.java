@@ -231,9 +231,9 @@ public class LoremViewsFactory implements RemoteViewsService.RemoteViewsFactory 
 						p.setSailLinka(weba + produktu_linka);
 					}
 					berriLista.add(p);
-					System.out.println("linka: " + p.getLink() + " desk: "
-							+ p.getSubtitle() + " irudia: " + produktu_irudia
-							+ " saila:" + p.getSaila());
+//					System.out.println("linka: " + p.getLink() + " desk: "
+//							+ p.getSubtitle() + " irudia: " + produktu_irudia
+//							+ " saila:" + p.getSaila());
 					// Toast.makeText(getActivity().getApplicationContext(),"partido "+spartido,Toast.LENGTH_SHORT).show();
 				}
 			} catch (IOException e1) {
