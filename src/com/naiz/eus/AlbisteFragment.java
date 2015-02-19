@@ -19,11 +19,14 @@ import com.naiz.eus.model.NavDrawerItem;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.ListFragment;
+import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Rect;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,7 +37,8 @@ import android.widget.TextView;
 
 public class AlbisteFragment extends ListFragment implements OnItemClickListener {
 	private String searchURL = "http://www.naiz.eus/";
-	private ArrayList<Berria> berriLista;
+	public ArrayList<Berria> berriLista;
+	public ArrayList<String> LinkLista;
 	private String titularra = "";
 	private ImageView logoa; 
 	private TextView TitView;
@@ -55,6 +59,7 @@ public class AlbisteFragment extends ListFragment implements OnItemClickListener
         TitView = (TextView) rootView.findViewById(R.id.txtLabela);
 		logoa = (ImageView) rootView.findViewById(R.id.img_logo);
 		berriLista=new ArrayList<Berria>();
+		LinkLista= new ArrayList<String>();
 		AsinkTask thread = new AsinkTask();
 		URL url = null;
 		thread.execute(url);
@@ -83,6 +88,11 @@ public class AlbisteFragment extends ListFragment implements OnItemClickListener
 		        		fragment.setTextInTextView(img,titularra);
 		        	}
 	            }
+				
+				for(int i=0;i<berriLista.size();i++){
+					String link = berriLista.get(i).getLink();
+					LinkLista.add(i, link);
+				}
 		    }
 		
 		    @Override
@@ -126,8 +136,8 @@ public class AlbisteFragment extends ListFragment implements OnItemClickListener
             if(AlbisteFragment.this.isVisible()){
             String[] navMenuTitles = getResources().getStringArray(R.array.nav_drawer_items);
             MainActivity.navDrawerItems.set(0, new NavDrawerItem(navMenuTitles[0], R.drawable.ic_home, true, (Integer.toString(albisteak.size()))));
-            MainActivity.albisteKop=albisteak.size();
             }
+            MainActivity.albisteKop=albisteak.size();
             
         	for (int i=0;i<albisteak.size();i++) {
         		publishProgress((Integer)((100/albisteak.size())*i));
@@ -226,12 +236,21 @@ public class AlbisteFragment extends ListFragment implements OnItemClickListener
 
 	@Override
 	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-			String link = berriLista.get(position).getLink();
-			MainActivity.hasieran=false;
-		  		  FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-		        	 fragmentManager.beginTransaction()
-		  		     .replace(R.id.frame_container, AlbisteBatFragment.newInstance(link))
-		  		     .commit();
+		//System.out.println("AlbisteFragment - onItemClick:linklista.size="+LinkLista.size());
+		MainActivity.hasieran=false;
+		String link = berriLista.get(position).getLink();
+		if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.GINGERBREAD_MR1) {
+			FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+			fragmentManager.beginTransaction()
+	  		     .replace(R.id.frame_container, AlbisteBatFragment.newInstance(link))
+	  		     .commit();
+		}else{
+			Sample s= new Sample(R.string.titulua, ScreenSlideActivity.class);
+			Intent i=new Intent(getActivity(),s.activityClass);
+			i.putStringArrayListExtra("Linkak", LinkLista);
+			i.putExtra("pos", position);
+			startActivity(i);
+		}
 	}
 
 	public static Fragment newInstance(String tit,String link) {
@@ -242,4 +261,22 @@ public class AlbisteFragment extends ListFragment implements OnItemClickListener
 		logoa.setImageBitmap(img);
 		TitView.setText(titular);
 	}
+    /**
+     * This class describes an individual sample (the sample title, and the activity class that
+     * demonstrates this sample).
+     */
+    private class Sample {
+        private CharSequence title;
+        private Class<? extends Activity> activityClass;
+
+        public Sample(int titleResId, Class<? extends Activity> activityClass) {
+            this.activityClass = activityClass;
+            this.title = getResources().getString(titleResId);
+        }
+
+        @Override
+        public String toString() {
+            return title.toString();
+        }
+    }
 }

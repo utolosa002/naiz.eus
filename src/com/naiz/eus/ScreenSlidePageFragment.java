@@ -1,12 +1,32 @@
+/*
+ * Copyright 2012 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.naiz.eus;
 
 import java.io.IOException;
+import java.util.ArrayList;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
-import com.naiz.eus.R;
+
 import com.naiz.eus.model.Berria;
-import android.support.v4.app.Fragment;
+
+import android.annotation.SuppressLint;
+import android.app.Fragment;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -18,31 +38,91 @@ import android.webkit.WebView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-public class AlbisteBatFragment extends Fragment{
-
-	private static String searchURL;
+/**
+ * A fragment representing a single step in a wizard. The fragment shows a dummy title indicating
+ * the page number, along with some dummy text.
+ *
+ * <p>This class is used by the {@link CardFlipActivity} and {@link
+ * ScreenSlideActivity} samples.</p>
+ */
+@SuppressLint("NewApi")
+public class ScreenSlidePageFragment extends Fragment {
+    /**
+     * The argument key for the page number this fragment represents.
+     */
+    public static final String ARG_PAGE = "page";
+	private static final String Linkak = "links";
+	private String searchURL;
 	private Berria b=new Berria();
 	public static WebView Berriatxt;
-	public AlbisteBatFragment(){}
-	
-	public AlbisteBatFragment(String link) {
-	// TODO Auto-generated constructor stub
-		 searchURL=link;
-	}
 
-	@Override
+    /**
+     * The fragment's page number, which is set to the argument value for {@link #ARG_PAGE}.
+     */
+    private int mPageNumber;
+//    private int uneko;
+	private ArrayList<String> searchURLak;
+
+    /**
+     * Factory method for this fragment class. Constructs a new fragment for the given page number.
+     */
+    public static ScreenSlidePageFragment create(int pageNumber,ArrayList<String> Links) {
+        ScreenSlidePageFragment fragment = new ScreenSlidePageFragment();
+        Bundle args = new Bundle();
+        args.putInt(ARG_PAGE, pageNumber);
+
+    	System.out.println("SlideSlidePageFrag - create:pageNumber="+pageNumber);
+    	System.out.println("SlideSlidePageFrag - create:links="+Links.size());
+    	
+        args.putStringArrayList(Linkak, Links);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    public ScreenSlidePageFragment() {
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mPageNumber = getArguments().getInt(ARG_PAGE);
+//        uneko = getArguments().getInt("uneko");
+
+    	System.out.println("SlideSlidePageFrag - onCreate:mPageNumber ="+mPageNumber);
+//    	System.out.println("SlideSlidePageFrag - onCreate:uneko ="+uneko);
+    	System.out.println("SlideSlidePageFrag - onCreate:links="+getArguments().getStringArrayList(Linkak).size());
+    	
+    	searchURLak = getArguments().getStringArrayList(Linkak);
+    	System.out.println("SlideSlidePageFrag - oncreate: searchURLak ="+searchURLak.size());
+     	
+    	if(mPageNumber<searchURLak.size()){
+    		searchURL = searchURLak.get(mPageNumber);
+    		System.out.println("SlideSlidePageFrag - oncreate: searchURL ="+searchURL);
+    	}else{
+    		searchURL = searchURLak.get(searchURLak.size()-1);
+    	}
+    	
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
- 
-        View rootView = inflater.inflate(R.layout.berri_bat, container, false);
+        // Inflate the layout containing a title and body text.
+        ViewGroup rootView = (ViewGroup) inflater
+                .inflate(R.layout.fragment_screen_slide_page, container, false);
+        //searchURL = searchURLak.get(mPageNumber);
+//        // Set the title view to show the page number.
+//        ((TextView) rootView.findViewById(android.R.id.text1)).setText(
+//                getString(R.string.title_template_step, mPageNumber + 1));
+
+        
         final TextView Saila = (TextView) rootView.findViewById(R.id.textSaila);
         final TextView Azpitit = (TextView) rootView.findViewById(R.id.textAzpitit);
         Berriatxt= (WebView) rootView.findViewById(R.id.berriatxt);
         final TextView ExtraInfo = (TextView) rootView.findViewById(R.id.textnaiz);
         final TextView Titularra = (TextView) rootView.findViewById(R.id.textTitularra);
         final ImageView Irudia = (ImageView) rootView.findViewById(R.id.berrirudia);
-    
-        
+
 		ThreadClass thread = new ThreadClass(this);
 		thread.start(); 
 		//wait for thread to finish
@@ -55,7 +135,7 @@ public class AlbisteBatFragment extends Fragment{
 		Saila.setText(b.getSaila());
 		Azpitit.setText(b.getSubtitle());
 		Titularra.setText(b.getTitle());
-		ExtraInfo.setText(b.getExtraInfo().replaceAll("||", " | "));
+		ExtraInfo.setText(b.getExtraInfo());
 		
 		WebSettings settings = Berriatxt.getSettings();
         settings.setSupportZoom(false);
@@ -76,9 +156,15 @@ public class AlbisteBatFragment extends Fragment{
 		Irudia.setImageBitmap(b.getImage());
 
         return rootView;
-        
     }
-	class ThreadClass extends Thread {
+
+    /**
+     * Returns the page number represented by this fragment object.
+     */
+    public int getPageNumber() {
+        return mPageNumber;
+    }
+    class ThreadClass extends Thread {
 		Fragment  cl;
 	    public ThreadClass(Fragment cl){
 	       this.cl = cl;
@@ -137,7 +223,7 @@ public class AlbisteBatFragment extends Fragment{
     		}
     		
     		String Info= albiste_info.text();
-    		b.setExtraInfo(Info);
+    		b.setExtraInfo(Info.replaceAll("\\|", " | "));
     		
     		String text_albiste_saila="";
     		if(albiste_saila.first()!=null){
@@ -169,15 +255,5 @@ public class AlbisteBatFragment extends Fragment{
 			e1.printStackTrace();
 		}	
     	}
- 	}
-
-	public static Fragment newInstance() {
-		AlbisteBatFragment fragment = new AlbisteBatFragment();
-        return fragment;  
-	}
-
-	public static Fragment newInstance(String link) {
-		AlbisteBatFragment fragment = new AlbisteBatFragment(link);
-        return fragment;
-	}
+}
 }

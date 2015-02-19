@@ -47,6 +47,11 @@
     <string name="titulua">titulua</string>
     <string name="saila">Saila</string>
     <string name="productos_destacados">Berri nagusiak</string>
+    
+    <string name="action_previous">Aurrekoa</string>
+    <string name="action_next">Hurrengoa</string>
+    <string name="action_finish">Amaitu</string>
+    
     <string name="appwidget_text_format">
         <xliff:g id="prefix">%1$s</xliff:g>: 
         <xliff:g id="time">%2$s</xliff:g>
