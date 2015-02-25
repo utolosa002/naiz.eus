@@ -41,9 +41,10 @@ public class BlogBatFragment extends Fragment {
         final ImageView egileIrudia = (ImageView) rootView.findViewById(R.id.blog_egile_image);
         final TextView egilea = (TextView) rootView.findViewById(R.id.blog_egilea);
         final TextView blogIzena= (TextView) rootView.findViewById(R.id.blog_izena);
-        final TextView postTit = (TextView) rootView.findViewById(R.id.blog_Post_tit);
-        postTxt = (WebView) rootView.findViewById(R.id.blog_Post_txt);
-        final ImageView postIrudia = (ImageView) rootView.findViewById(R.id.blog_Post_irudia);
+        final TextView postTit = (TextView) rootView.findViewById(R.id.blog_post_tit);
+        final TextView postData = (TextView) rootView.findViewById(R.id.blog_post_data);
+        postTxt = (WebView) rootView.findViewById(R.id.blog_post_txt);
+        final ImageView postIrudia = (ImageView) rootView.findViewById(R.id.blog_post_irudia);
 		
 		ThreadClass thread = new ThreadClass(this);
 		thread.start(); 
@@ -58,6 +59,7 @@ public class BlogBatFragment extends Fragment {
         egilea.setText(b.getEgilea());
         blogIzena.setText(b.getTit());
         postTit.setText(b.getPostTit());
+        postData.setText(b.getPostData());
 
 		WebSettings settings = postTxt.getSettings();
         settings.setSupportZoom(false);
@@ -95,17 +97,25 @@ public class BlogBatFragment extends Fragment {
 
             Elements egilea =doc.select("div[class^=author]");
             Elements tituluak = doc.select("div[class^=title]");
+            Elements extra = doc.select("div[class^=date]");
             Elements header = doc.select("div[class*=blogs-header]");
             Elements egile_irudiak = header.select("img");
             Elements post_osoa = doc.select("div[class=content]");
             //Elements post_irudia = post_osoa.first().select("img");
             
-            //blog izena
+          //blog izena
     		String blog_izena="";
     		if(tituluak.first()!=null){
     			blog_izena = tituluak.first().text();
     			}
     		b.setTit(blog_izena);
+    		
+    		//blog extra
+    		String blog_extra="";
+    		if(extra.first()!=null){
+    			blog_extra= extra.first().text();
+    			}
+    		b.setPostData(blog_extra);
     		
     		//post izena
     		String post_izena="";

@@ -56,6 +56,8 @@ public class ScreenSlideActivity extends FragmentActivity {
      */
     private static final int NUM_PAGES = MainActivity.albisteKop;
 
+	public static int testutamaina=MainActivity.testutamaina;
+
     /**
      * The pager widget, which handles animation and allows swiping horizontally to access previous
      * and next wizard steps.
@@ -120,8 +122,23 @@ public class ScreenSlideActivity extends FragmentActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-        case R.id.action_settings:
+        
+		switch (item.getItemId()) {
+        case R.id.action_share:
+        	Intent mShareIntent;
+    	mShareIntent = new Intent();
+		mShareIntent.setAction(Intent.ACTION_SEND);
+		mShareIntent.setType("text/plain");
+		mShareIntent.putExtra(Intent.EXTRA_TEXT,":naiz - "+Linkak.get(pos));
+		startActivity(mShareIntent);
+	return true;
+		case R.id.action_favorites:
+			Intent i = new Intent(this,FavActivity.class);
+//			i.putStringArrayListExtra("Linkak", LinkLista);
+//			i.putExtra("pos", position);
+			startActivity(i);
+			return true;
+        case R.id.action_login:
 			CharSequence login[] = new CharSequence[] {"naiz:", "google", "facebook", "erregistratu"};
 
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -152,14 +169,14 @@ public class ScreenSlideActivity extends FragmentActivity {
 //				e.printStackTrace();
 //			}
 			return true;
-		case R.id.textsize_seekbar:
+		case R.id.action_textsize_seekbar:
 			AlertDialog.Builder builder2 = new AlertDialog.Builder(this);
 			LayoutInflater inflater = this.getLayoutInflater();
 			View v=inflater.inflate(R.layout.global, null);
 			builder2.setView(v).setTitle(R.string.testu_tamaina_tit);
 			SeekBar sbetxtsize = (SeekBar)v.findViewById(R.id.textsize_seekbar);
 			sbetxtsize.setMax(50);
-			sbetxtsize.setProgress(MainActivity.testutamaina);
+			sbetxtsize.setProgress(ScreenSlideActivity.testutamaina);
 			sbetxtsize.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
 				@Override
 				public void onStopTrackingTouch(SeekBar seekBar) {
@@ -171,32 +188,25 @@ public class ScreenSlideActivity extends FragmentActivity {
 				}
 				@Override
 				public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+					ScreenSlideActivity.testutamaina=progress;
 					MainActivity.testutamaina=progress;
 					if (ScreenSlidePageFragment.Berriatxt!=null){
 						WebSettings settings = ScreenSlidePageFragment.Berriatxt.getSettings();
-		            	settings.setDefaultFontSize(MainActivity.testutamaina);
+		            	settings.setDefaultFontSize(ScreenSlideActivity.testutamaina);
 		            }
 		            if(BlogBatFragment.postTxt!=null){
 		            	WebSettings settings = BlogBatFragment.postTxt.getSettings();
-		            	settings.setDefaultFontSize(MainActivity.testutamaina);
+		            	settings.setDefaultFontSize(ScreenSlideActivity.testutamaina);
 		            }
 		        }
 			});
 			builder2.show();
 			return true;
-			case R.id.action_favorites:
-				AlertDialog.Builder builder3 = new AlertDialog.Builder(this);
-				LayoutInflater inflater3 = this.getLayoutInflater();
-				View v3=inflater3.inflate(R.layout.global, null);
-				builder3.setView(v3).setTitle("Gogokoak ikusi");
-				builder3.show();
-				return true;
-            case android.R.id.home:
-                // Navigate "up" the demo structure to the launchpad activity.
-                // See http://developer.android.com/design/patterns/navigation.html for more.
-                NavUtils.navigateUpTo(this, new Intent(this, MainActivity.class));
-                return true;
-
+        case android.R.id.home:
+            // Navigate "up" the demo structure to the launchpad activity.
+            // See http://developer.android.com/design/patterns/navigation.html for more.
+            NavUtils.navigateUpTo(this, new Intent(this, MainActivity.class));
+            return true;
             case R.id.action_previous:
                 // Go to the previous step in the wizard. If there is no previous step,
                 // setCurrentItem will do nothing.
@@ -212,7 +222,11 @@ public class ScreenSlideActivity extends FragmentActivity {
 
         return super.onOptionsItemSelected(item);
     }
-
+	@Override
+	public void onBackPressed() {
+		MainActivity.hasieran=true;
+		super.onBackPressed();
+	}
     /**
      * A simple pager adapter that represents 5 {@link ScreenSlidePageFragment} objects, in
      * sequence.

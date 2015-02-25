@@ -15,6 +15,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Bundle;
 import android.util.Log;
 import android.widget.RemoteViews;
 @SuppressLint("NewApi")
@@ -24,7 +25,10 @@ public class WidgetProvider extends AppWidgetProvider {
 	@SuppressLint("NewApi")
 	@Override
 	public void onUpdate(Context ctxt, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
-		
+
+	    if (PhoneBootCompleteReceiver.wasPhoneBootSucessful) {
+	     //   PhoneBootCompleteReceiver.wasPhoneBootSucessful = false;
+	 
 		for (int i=0; i<appWidgetIds.length; i++) {
 			Log.i("WidgetProvider"+i, "LOG");
 			
@@ -54,6 +58,8 @@ public class WidgetProvider extends AppWidgetProvider {
 			appWidgetManager.updateAppWidget(appWidgetIds[i], widget);
 			updateWidget(ctxt);
 		}
+		}
+		updateWidget(ctxt);
 		super.onUpdate(ctxt, appWidgetManager, appWidgetIds);
 	}
 	@Override
@@ -64,7 +70,11 @@ public class WidgetProvider extends AppWidgetProvider {
 		}
 		Log.e("onReceive", "LOG");
 	}
-	
+	@Override
+	public void onAppWidgetOptionsChanged(final Context context, final AppWidgetManager appWidgetManager, final int appWidgetId, final Bundle newOptions) { 
+		 super.onAppWidgetOptionsChanged(context,appWidgetManager,appWidgetId,newOptions);
+		 updateWidget(context);
+	}
 	private void updateWidget(Context ctxt) {
 		Log.e("updateWidget", "LOG");
 		

@@ -89,8 +89,9 @@ public class EguraldiBatFragment extends Fragment {
 			//	webView.loadData(html, "text/html", "utf-8");
 		        webView.getSettings().setJavaScriptEnabled(true);
 				webView.setWebViewClient(new WebViewClient());
-
-				 html=html.replaceAll("=\"/", "=\"http://www.naiz.eus/");
+				if (html!=null){
+					html=html.replaceAll("=\"/", "=\"http://www.naiz.eus/");
+				}
 				webView.loadDataWithBaseURL(null, html, "text/html", "utf-8", null);
 		    }
 		

@@ -11,6 +11,7 @@ private String blogLink;
 private String postTit;
 private String postText;
 private String postLink;
+private String postData;
 private Bitmap postImage;
 
 /**
@@ -72,5 +73,11 @@ public Bitmap getPostImage() {
 }
 public void setPostImage(Bitmap postImage) {
 	this.postImage = postImage;
+}
+public String getPostData() {
+	return postData;
+}
+public void setPostData(String postData) {
+	this.postData = postData;
 }
 }

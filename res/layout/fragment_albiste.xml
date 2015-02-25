@@ -14,27 +14,34 @@
             android:id="@+id/img_logo"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="10sp"
+            android:layout_marginTop="5sp"
 			android:layout_gravity="center"
 			android:scaleType="fitCenter"          
             android:contentDescription="@string/logo" />
-    </LinearLayout>
+    
         <TextView
             android:id="@+id/txtLabela"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="albisteak"
-            android:textSize="21sp" />
-
+            android:text="Eguneratua:"
+            android:textSize="15sp" />
+</LinearLayout>
+        <ProgressBar
+            android:id="@+id/progressBar1"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+        android:paddingTop="0dp"
+        android:paddingBottom="0dp"/>
     <ListView
         android:id="@android:id/list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:divider="@android:color/transparent"
         android:dividerHeight="10dp"
-        android:paddingLeft="10dip"
-        android:paddingRight="10dip"
-        android:paddingTop="1dip" >
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:paddingTop="1dp" >
     </ListView>
 
 </LinearLayout>

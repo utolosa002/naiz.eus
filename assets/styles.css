@@ -5154,9 +5154,9 @@ font-size:20px;
 }
 .tiempo .tiempo-interior div {float:left;}
 .tiempo .tiempo-interior .map-col-euskal-herria { position: relative; width:547px; height:300px; height:446px;background: #fff url("euskal-herria.png") 0 0 no-repeat;}
-.tiempo .tiempo-interior .map-col-euskal-herriaz-harago {background: url("../images/mapas/euskal-herriaz-haratago.png") no-repeat scroll 0 0 #fff;height: 296px;position: relative;width: 547px; }
-.tiempo .tiempo-interior .map-col-europa {position: relative; width:547px; height:300px; height:446px;background: #fff url("../images/mapas/europa.png") 0 0 no-repeat;}
-.tiempo .tiempo-interior .map-col-mundua {position: relative; width:547px; height:300px; height:446px;background: #fff url("../images/mapas/mundua.png") 0 0 no-repeat;}
+.tiempo .tiempo-interior .map-col-euskal-herriaz-harago {background: url("euskal-herriaz-haratago.png") no-repeat scroll 0 0 #fff;height: 296px;position: relative;width: 547px; }
+.tiempo .tiempo-interior .map-col-europa {position: relative; width:547px; height:300px; height:446px;background: #fff url("europa.png") 0 0 no-repeat;}
+.tiempo .tiempo-interior .map-col-mundua {position: relative; width:547px; height:300px; height:446px;background: #fff url("mundua.png") 0 0 no-repeat;}
 
 .tiempo .dossier-topic .border-separator { border-left:1px solid #DCDCDC; margin-left:3px; padding-left:6px; }
 

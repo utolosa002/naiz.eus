@@ -2,6 +2,8 @@ package com.naiz.eus;
 
 import com.naiz.eus.R;
 import com.naiz.eus.adapter.NavDrawerListAdapter;
+import com.naiz.eus.db.DatabaseHandler;
+import com.naiz.eus.model.Berria;
 import com.naiz.eus.model.NavDrawerItem;
 import com.naiz.eus.widget.WidgetProvider;
 
@@ -23,13 +25,14 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.TypedArray;
+import android.database.sqlite.SQLiteException;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.ActionBarDrawerToggle;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -42,7 +45,7 @@ import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 
-@SuppressLint("NewApi")
+@SuppressLint("NewApi")//11 api onartzen du, 10 ez
 public class MainActivity extends FragmentActivity {
 	private DrawerLayout mDrawerLayout;
 	private ListView mDrawerList;
@@ -83,7 +86,7 @@ public class MainActivity extends FragmentActivity {
 
 		navDrawerItems = new ArrayList<NavDrawerItem>();
 
-		/////////////////widget//
+		/////////////////widget////////////////////////////////
 		//TODO- ez da aktualizatzen widgeta hasterakoan??? ezta zerbitzua martxan
 		Intent intent = new Intent(this,WidgetProvider.class);
 		intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
@@ -93,10 +96,29 @@ public class MainActivity extends FragmentActivity {
 		//int[] ids = {widgetId};
 		intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS,ids);
 		sendBroadcast(intent);
-		
-		
+		//////////////////////DB///////////////////////
+		DatabaseHandler db = new DatabaseHandler(this);
+		try {
+			db.createDataBase();
+			db.close();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			System.out.println("gaizki db");
+		}
+		ArrayList<Berria> alb =null;
+		try {
+			alb = db.getBerriak("azala");
+		} catch (SQLiteException | IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		int albkop=0;
+		if (alb!=null){
+			albkop=alb.size();
+		}
 		// Home
-		navDrawerItems.add(new NavDrawerItem(navMenuTitles[0], navMenuIcons.getResourceId(0, -1),true, Integer.toString(albisteKop)));
+		navDrawerItems.add(new NavDrawerItem(navMenuTitles[0], navMenuIcons.getResourceId(0, -1),true, Integer.toString(albkop)));
 		// Iritzia
 		navDrawerItems.add(new NavDrawerItem(navMenuTitles[1], navMenuIcons.getResourceId(1, -1), true, "50+"));
 		// naiz+
@@ -129,8 +151,7 @@ public class MainActivity extends FragmentActivity {
 
 		mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
 				R.drawable.ic_drawer, //nav menu toggle icon
-				R.string.app_name, // nav drawer open - description for accessibility
-				R.string.app_name // nav drawer close - description for accessibility
+				R.string.app_name // nav drawer open - description for accessibility
 		) {
 			public void onDrawerClosed(View view) {
 				getActionBar().setTitle(mTitle);
@@ -180,7 +201,7 @@ public class MainActivity extends FragmentActivity {
 		}
 		// Handle action bar actions click
 		switch (item.getItemId()) {
-		case R.id.action_settings:
+		case R.id.action_login:
 			CharSequence login[] = new CharSequence[] {"naiz:", "google", "facebook", "erregistratu"};
 
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -211,7 +232,7 @@ public class MainActivity extends FragmentActivity {
 //				e.printStackTrace();
 //			}
 			return true;
-		case R.id.textsize_seekbar:
+		case R.id.action_textsize_seekbar:
 			AlertDialog.Builder builder2 = new AlertDialog.Builder(this);
 			LayoutInflater inflater = MainActivity.this.getLayoutInflater();
 			View v=inflater.inflate(R.layout.global, null);
@@ -244,11 +265,10 @@ public class MainActivity extends FragmentActivity {
 			builder2.show();
 			return true;
 			case R.id.action_favorites:
-				AlertDialog.Builder builder3 = new AlertDialog.Builder(this);
-				LayoutInflater inflater3 = MainActivity.this.getLayoutInflater();
-				View v3=inflater3.inflate(R.layout.global, null);
-				builder3.setView(v3).setTitle("Gogokoak ikusi");
-				builder3.show();
+				Intent i = new Intent(this,FavActivity.class);
+//				i.putStringArrayListExtra("Linkak", LinkLista);
+//				i.putExtra("pos", position);
+				startActivity(i);
 				return true;
 		default:
 			return super.onOptionsItemSelected(item);
@@ -262,7 +282,8 @@ public class MainActivity extends FragmentActivity {
 	public boolean onPrepareOptionsMenu(Menu menu) {
 		// if nav drawer is opened, hide the action items
 		boolean drawerOpen = mDrawerLayout.isDrawerOpen(mDrawerList);
-		menu.findItem(R.id.action_settings).setVisible(!drawerOpen);
+		menu.findItem(R.id.action_login).setVisible(!drawerOpen);
+		menu.findItem(R.id.action_textsize_seekbar).setVisible(!drawerOpen);
 	//	menu.findItem(R.menu.main).setVisible(false);
 		return super.onPrepareOptionsMenu(menu);
 

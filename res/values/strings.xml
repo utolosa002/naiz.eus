@@ -5,7 +5,6 @@
     <string name="favorites_menu">Gogokoak</string>
     <string name="testu_tamaina_tit">Aldatu testu tamaina</string>
     <string name="testsize_menu">Testu tamaina</string>
-    <string name="share">Partekatu</string>
     <!-- Nav Drawer Menu Items -->
     <string-array name="nav_drawer_items">
         <item >Info</item>
@@ -19,13 +18,13 @@
     </string-array>
     
     <string-array name="herrialdespinnerItems">
-    <item>Araba</item>
-    <item>Bizkaia</item>
-    <item>Gipuzkoa</item>
-    <item>Lapurdi</item>
-    <item>Nafarroa</item>
-    <item>Nafarroa Behera</item>
-    <item>Zuberoa</item>
+    <item>araba</item>
+    <item>bizkaia</item>
+    <item>gipuzkoa</item>
+    <item>lapurdi</item>
+    <item>nafarroa</item>
+    <item>nafarroa behera</item>
+    <item>zuberoa</item>
     </string-array>
     
     <!-- Nav Drawer List Item Icons -->
@@ -47,11 +46,15 @@
     <string name="titulua">titulua</string>
     <string name="saila">Saila</string>
     <string name="productos_destacados">Berri nagusiak</string>
+    <string name="message_empty_layout_fav">Gogokorik ez duzu</string>
     
+    <string name="action_share">Partekatu</string>
     <string name="action_previous">Aurrekoa</string>
     <string name="action_next">Hurrengoa</string>
     <string name="action_finish">Amaitu</string>
-    
+    <string name="action_add_fav_item">Gehitu gogokoa</string>
+    <string name="action_remove_fav_item">Ezabatu gogokoa</string>
+
     <string name="appwidget_text_format">
         <xliff:g id="prefix">%1$s</xliff:g>: 
         <xliff:g id="time">%2$s</xliff:g>
