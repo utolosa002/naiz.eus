@@ -59,7 +59,6 @@ public class WidgetProvider extends AppWidgetProvider {
 			updateWidget(ctxt);
 		}
 		}
-		updateWidget(ctxt);
 		super.onUpdate(ctxt, appWidgetManager, appWidgetIds);
 	}
 	@Override
