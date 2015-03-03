@@ -16,8 +16,10 @@
 
 package com.naiz.eus;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.net.URL;
 import java.text.ParseException;
 import java.util.ArrayList;
 
@@ -25,6 +27,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
+import com.naiz.eus.adapter.BerriaListAdapter;
 import com.naiz.eus.db.DatabaseHandler;
 import com.naiz.eus.model.Berria;
 
@@ -41,6 +44,8 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.graphics.Bitmap.CompressFormat;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
@@ -75,7 +80,8 @@ public class ScreenSlidePageFragment extends Fragment {
 	private static final String Linkak = "links";
 	private String searchURL;
 	private Berria b = new Berria();
-	public static WebView Berriatxt;
+	public WebView Berriatxt;
+	public ImageView Irudia;
 
 	/**
 	 * The fragment's page number, which is set to the argument value for
@@ -168,8 +174,8 @@ public class ScreenSlidePageFragment extends Fragment {
 				.findViewById(R.id.textnaiz);
 		final TextView Titularra = (TextView) rootView
 				.findViewById(R.id.textTitularra);
-		final ImageView Irudia = (ImageView) rootView
-				.findViewById(R.id.berrirudia);
+		Irudia = (ImageView) rootView
+		.findViewById(R.id.berrirudia);
 		
 	
 
@@ -193,17 +199,45 @@ public class ScreenSlidePageFragment extends Fragment {
 			Azpitit.setText(b.getSubtitle());
 			Titularra.setText(b.getTitle());
 			ExtraInfo.setText(b.getExtraInfo());
-
-			ThreadClass2 thread2 = new ThreadClass2(this);
-			thread2.start();
-			// wait for thread to finish
-			try {
-				thread2.join();
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			//System.out.println("b.getBerria()0= "+b.getBerria());
+			if (b.getBerria()==null||b.getBerria()==""||b.getBerria()==" "){
+			System.out.println("b.getBerria()1= "+b.getBerria());
+			AsinkTask thread2 = new AsinkTask();
+			URL url = null;
+			thread2.execute(url);
+			
+			}else{
+				WebSettings settings = Berriatxt.getSettings();
+				settings.setSupportZoom(false);
+				settings.setBuiltInZoomControls(false);
+				settings.setDefaultTextEncodingName("utf-8");
+				settings.setDefaultFontSize(ScreenSlideActivity.testutamaina);
+				Berriatxt.getSettings().setJavaScriptEnabled(true);
+				Berriatxt.setBackgroundColor(Color.TRANSPARENT);
+			
+				System.out.println("b.getBerria()2= "+b.getBerria().toString());
+				Berriatxt.loadDataWithBaseURL(null, b.getBerria(), "text/html", "utf-8",null);
+				// Berria.setText(b.getBerria());
+				Irudia.setImageBitmap(b.getImage());
 			}
+		}
+		return rootView;
+	}
 
+	/**
+	 * Returns the page number represented by this fragment object.
+	 */
+	public int getPageNumber() {
+		return mPageNumber;
+	}
+
+	private class AsinkTask extends AsyncTask<URL, Integer, Long> {
+
+		@Override
+		protected void onPostExecute(Long result) {
+			super.onPostExecute(result);
+			if (ScreenSlidePageFragment.this.getActivity() == null)
+				return;
 			WebSettings settings = Berriatxt.getSettings();
 			settings.setSupportZoom(false);
 			settings.setBuiltInZoomControls(false);
@@ -248,67 +282,27 @@ public class ScreenSlidePageFragment extends Fragment {
 			}
 			// TODO INTENT BERRIA SORTU BERRIAREKIN
 			String html = "<html><body style='text-align:justify;'>"+ b.getBerria() + "</body></html>";
-			Berriatxt.loadDataWithBaseURL(null, html, "text/html", "utf-8",
-					null);
 
+			if (ScreenSlidePageFragment.this.isVisible()) {
+			Berriatxt.loadDataWithBaseURL(null, html, "text/html", "utf-8",null);
 			// Berria.setText(b.getBerria());
 			Irudia.setImageBitmap(b.getImage());
-		}
-		return rootView;
-	}
-
-	/**
-	 * Returns the page number represented by this fragment object.
-	 */
-	public int getPageNumber() {
-		return mPageNumber;
-	}
-
-	class ThreadClass extends Thread {
-		Fragment cl;
-
-		public ThreadClass(Fragment cl) {
-			this.cl = cl;
-		}
-
-		public void run() {
-			Document doc = null;
-			System.out.println("searchURL: " + searchURL);
-			try {
-				lortudbBerria();
-			} catch (ParseException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-
-		private void lortudbBerria() throws ParseException {
-			db.close();
-			if (db.checkDataBase() == false) {
-				try {
-					db.createDataBase();
-					db.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-			try {
-				b = db.getBerria(searchURL);
-			} catch (SQLiteException | IOException e) {
-				e.printStackTrace();
 			}
 
-		}
-	}
-
-	class ThreadClass2 extends Thread {
-		Fragment cl;
-
-		public ThreadClass2(Fragment cl) {
-			this.cl = cl;
+			ByteArrayOutputStream stream = new ByteArrayOutputStream();
+			if (b.getImage()!=null){
+				b.getImage().compress(CompressFormat.PNG, 0, stream);
+			}
+			db.eguneratuBerria(html,stream.toByteArray(),b.getLink());
 		}
 
-		public void run() {
+		@Override
+		protected void onPreExecute() {
+			super.onPreExecute();
+			
+		}
+
+		protected Long doInBackground(URL... urls) {
 			Document doc = null;
 			System.out.println("searchURL: " + searchURL);
 			try {
@@ -395,36 +389,63 @@ public class ScreenSlidePageFragment extends Fragment {
 							}
 							b.setSailLinka(weba + produktu_linka);
 						}
-
+} String html_berria = "";
 						Elements berriaNaiz = doc
 								.select("div[class*=report-text]");
 						Elements berriaGara = doc
 								.select("div[class*=ART_BODY]");
+						Elements berriaElkarriz = doc
+								.select("div[class*=new-content]");
 						if (berriaNaiz.first() != null) {
 							html_berria = berriaNaiz.first().outerHtml();
 						} else if (berriaGara.first() != null) {
 							html_berria = berriaGara.first().outerHtml();
+						} else if (berriaElkarriz.first() != null) {
+							html_berria = berriaElkarriz.first().outerHtml();
 						}
-						b.setBerria(html_berria.trim());
-					} else {
-						String html_berria = "";
-						Elements berriaNaiz = doc
-								.select("div[class*=report-text]");
-						Elements berriaGara = doc
-								.select("div[class*=ART_BODY]");
-						if (berriaNaiz.first() != null) {
-							html_berria = berriaNaiz.first().outerHtml();
-						} else if (berriaGara.first() != null) {
-							html_berria = berriaGara.first().outerHtml();
-						}
+						//System.out.println("SuSBs aurretik"+html_berria);
+						if (html_berria==null||html_berria==""){
+			                Elements erosi = doc.select("div[class*=span-6 last]");
+			                html_berria = erosi.first().outerHtml();
+			    		}
 						b.setBerria(html_berria.trim());
 					}
-				}
-			} catch (IOException e1) {
+				} catch (IOException | NullPointerException e1) {
 				e1.printStackTrace();
 			}
+			return null;
+		}
+
+		}
+	
+	class ThreadClass extends Thread {
+		Fragment cl;
+
+		public ThreadClass(Fragment cl) {
+			this.cl = cl;
+		}
+
+		public void run() {
+			Document doc = null;
+			System.out.println("searchURL: " + searchURL);
+			try {
+				lortudbBerria();
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
+		private void lortudbBerria() throws ParseException {
+			try {
+				b = db.getBerria(searchURL);
+			} catch (SQLiteException | IOException e) {
+				e.printStackTrace();
+			}
+
 		}
 	}
+
 	 private void zoomImageFromThumb(final View thumbView, Bitmap imageResId,ViewGroup rootView) {
 	        // If there's an animation in progress, cancel it immediately and proceed with this one.
 	        if (mCurrentAnimator != null) {

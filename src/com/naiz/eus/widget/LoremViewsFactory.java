@@ -1,10 +1,13 @@
 package com.naiz.eus.widget;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Locale;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -12,14 +15,17 @@ import org.jsoup.select.Elements;
 
 import com.naiz.eus.MainActivity;
 import com.naiz.eus.R;
+import com.naiz.eus.db.DatabaseHandler;
 import com.naiz.eus.model.Berria;
 
 import android.annotation.SuppressLint;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
+import android.database.sqlite.SQLiteException;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.Bitmap.CompressFormat;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.TypedValue;
@@ -34,6 +40,10 @@ public class LoremViewsFactory implements RemoteViewsService.RemoteViewsFactory 
 	private String searchURL = "http://www.naiz.eus/";
 	private ArrayList<Berria> berriLista;
 	private String titularra = "";
+	Boolean eguneratuBeharra=false;
+	DatabaseHandler db;
+	String dbEguneratzea;
+	String naizEguneratzea;
 
 	public LoremViewsFactory(Context ctxt, Intent intent) {
 		Log.i("LoremViewsFactory", "LOG");
@@ -47,6 +57,16 @@ public class LoremViewsFactory implements RemoteViewsService.RemoteViewsFactory 
 
 		Log.i("LoremViewsFactory oncreate", "LOG");
 		berriLista = new ArrayList<Berria>();
+				//
+		db = new DatabaseHandler(this.ctxt);
+		try {
+			db.createDataBase();
+			db.close();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+			System.out.println("widget: gaizki db");
+		}
+		//
 		ThreadClass thread = new ThreadClass();
 		thread.start();
 		// wait for thread to finish
@@ -139,24 +159,123 @@ public class LoremViewsFactory implements RemoteViewsService.RemoteViewsFactory 
 	public void setAppWidgetId(int appWidgetId) {
 		this.appWidgetId = appWidgetId;
 	}
+	private void LortuBerriakdb() throws ParseException {
+		db.close();
+		if (db.checkDataBase() == false) {
+			try {
+				db.createDataBase();
+				db.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		ArrayList<Berria> albisteak = null;
+		try {
+			albisteak = db.getBerriak("azala");
+			dbEguneratzea = db.getEguneratzeData("azala");
+			System.out.println("widget: dbEguneratzea1 "+dbEguneratzea );
+			if(dbEguneratzea!=null){
+				Date today=new Date();
+				SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd HH.mm");
+				
+				int aurreratua = dbEguneratzea.compareTo(ft.format(today));
+				System.out.println("widget: ft.format(today) "+ft.format(today) );
+				System.out.println("widget: aurreratua1 "+aurreratua  );
+				if (aurreratua>0){//ondo>
+					String sEguna = dbEguneratzea.substring(8, 10);
+					//System.out.println("sEguna1 "+sEguna  );
+					Integer e = Integer.valueOf(sEguna);
+					e--;
+					String se=e.toString();
+					if(e<10){
+						se="0"+se;
+					}
+					//System.out.println("e1 "+e  );
+					dbEguneratzea=dbEguneratzea.substring(0, 8)+se+dbEguneratzea.substring(10,dbEguneratzea.length());
+					//	System.out.println("dbEguneratzea2 "+dbEguneratzea);
+				}
+			}else{
+				//db.setEguneratzeData("2015-01-01 00.00",saila);
+				dbEguneratzea="2015-01-01 00.00";
+			}
+		} catch (SQLiteException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		if (albisteak != null) {
+			MainActivity.albisteKop = albisteak.size();
+			for (int i = 0; i < albisteak.size(); i++) {
+				Berria p = albisteak.get(i);
+				berriLista.add(p);
+				System.out.println("widget: LortuBerriakdb: "+i);
+			}
+		} else {
+			System.out.println("widget: albisteak hutsak");
+		}
+	}		
+	private void berriTaulaHustu() {
+		db.close();
+		if (db.checkDataBase() == false) {
+			try {
+				db.createDataBase();
+				db.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		try {
+			db.berriakHustu("azala");
+		} catch (SQLiteException e) {
+			e.printStackTrace();
+		}
+	}
 
 	class ThreadClass extends Thread {
 		public ThreadClass() {
 		}
 
 		public void run() {
+				berriLista=new ArrayList<Berria>();
+				try {
+					LortuBerriakdb();
+				} catch (ParseException e) {
+					e.printStackTrace();
+				}
 			Document doc = null;
 			try {
 				doc = Jsoup.connect(searchURL).get();
 
-				// Connect to the web site
-				if (titularra == "") {
-					Elements izenburua = doc.select("ul[id*=nav-menu-logo]");
-					Elements titu = izenburua.select("li");
-					titularra = titu.get(0).text();// lista osoaren titulua ezarri
-				}
+				if (doc != null) {
+					// Connect to the web site
+					if (titularra == "") {
+						Elements izenburua = doc.select("ul[id*=nav-menu-logo]");
+						Elements titu = izenburua.select("li");
+						titularra = titu.get(0).text();// lista osoaren titulua ezarri
+					}
+					//}
+					String[] titularZatiak = titularra.split(" ");
+					naizEguneratzea = titularZatiak[titularZatiak.length-1];
+					
+					System.out.println("widget: naizEguneratzea "+naizEguneratzea);
+					System.out.println("widget: dbEguneratzea "+ dbEguneratzea);
+					Date today=new Date();
+					SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd");
+					if (naizEguneratzea == "" || naizEguneratzea == null){
+						naizEguneratzea = "2015-01-01 00.01";
+					}else{
+						naizEguneratzea = ft.format(today) + " " + naizEguneratzea;
+					}
+					//System.out.println("Current Date: " + ft.format(today));
+					int s = dbEguneratzea.compareTo(naizEguneratzea);
+					System.out.println("s: "+s+" dbEguneratzea:"+dbEguneratzea+" naizEguneratzea"+naizEguneratzea);
+					
+					if(s<0){
+						System.out.println("widget: sBARRU: "+s+" dbEguneratzea:"+dbEguneratzea+" naizEguneratzea"+naizEguneratzea);
+						berriTaulaHustu();
 				Elements produktuak = doc.select("div.article");
-
+				MainActivity.albisteKop=(produktuak.size());
+				db.setEguneratzeData(naizEguneratzea,"azala",produktuak.size());
 				for (int i = 0; i < produktuak.size(); i++) {
 					Elements produktu_izenb = produktuak.get(i).select(
 							"div[class*=title]");
@@ -186,11 +305,11 @@ public class LoremViewsFactory implements RemoteViewsService.RemoteViewsFactory 
 						p.setLink(weba + produktu_linka);
 					}
 
-					String text_produktu_desk = "";
+					String text_albiste_desk = "";
 					if (produktu_desk.first() != null) {
-						text_produktu_desk = produktu_desk.first().text();
+						text_albiste_desk = produktu_desk.first().text();
 					}
-					p.setSubtitle(text_produktu_desk);
+					p.setSubtitle(text_albiste_desk);
 					String produktu_irudia = "";
 					if (produktu_irudiak.first() != null) {
 
@@ -235,7 +354,23 @@ public class LoremViewsFactory implements RemoteViewsService.RemoteViewsFactory 
 //							+ p.getSubtitle() + " irudia: " + produktu_irudia
 //							+ " saila:" + p.getSaila());
 					// Toast.makeText(getActivity().getApplicationContext(),"partido "+spartido,Toast.LENGTH_SHORT).show();
+					ByteArrayOutputStream stream = new ByteArrayOutputStream();
+					 if (bm!=null){
+					 bm.compress(CompressFormat.PNG, 0, stream);
+					 }
+					try {
+						System.out.println("widget: db.SartuBerriaOK: "+p.getTitle());
+						db.SartuBerria("azala",text_p_izena, text_albiste_desk, Info, text_albiste_saila, "", stream.toByteArray(), p.getLink(),p.getSailLinka());
+					} catch (SQLiteException e) {
+						System.out.println("db.SartuBerria1: "+e.getMessage());
+						e.printStackTrace();
+					} catch (IOException e) {
+						System.out.println("db.SartuBerria2: "+e.getMessage());
+						e.printStackTrace();
+					}
 				}
+					}
+					}
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}

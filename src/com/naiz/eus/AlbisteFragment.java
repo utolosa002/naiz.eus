@@ -42,8 +42,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-public class AlbisteFragment extends ListFragment implements
-		OnItemClickListener {
+public class AlbisteFragment extends ListFragment implements OnItemClickListener {
 	private String searchURL = "http://www.naiz.eus/";
 	public ArrayList<Berria> berriLista;
 	public ArrayList<Berria> berriLista2;
@@ -53,24 +52,25 @@ public class AlbisteFragment extends ListFragment implements
 	private TextView TitView;
 	private DatabaseHandler db;
 	private ProgressBar dialog;
-	private String saila="azala";
+	private String non;
+	private String logoUrl;
 
 	public AlbisteFragment() {
 	}
 
-	public AlbisteFragment(String tit, String link) {
+	public AlbisteFragment(String tit, String link,String img) {
 		titularra = tit;
 		searchURL = link;
-		saila = tit;
+		non = tit;
+		logoUrl=img;
+		
 	}
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		MainActivity.hasieran = true;
 		View rootView;
-		rootView = inflater
-				.inflate(R.layout.fragment_albiste, container, false);
+		rootView = inflater.inflate(R.layout.fragment_albiste, container, false);
 		TitView = (TextView) rootView.findViewById(R.id.txtLabela);
 		logoa = (ImageView) rootView.findViewById(R.id.img_logo);
 		dialog = (ProgressBar) rootView.findViewById(R.id.progressBar1);
@@ -95,8 +95,8 @@ public class AlbisteFragment extends ListFragment implements
 		Bitmap img;
 		Document doc = null;
 		BerriaListAdapter adapter;
-		String naizEguneratzea;
-		String dbEguneratzea;
+		String naizEguneratzea="";
+		String dbEguneratzea="";
 		Boolean eguneratuBeharra=false;
 
 		@Override
@@ -108,19 +108,19 @@ public class AlbisteFragment extends ListFragment implements
 				dialog.setVisibility(View.INVISIBLE);
 			}
 			if(eguneratuBeharra){
-			berriLista=berriLista2;
-			LinkLista.clear();
-			for (int i = 0; i < berriLista.size(); i++) {
-				String link = berriLista.get(i).getLink();
-				LinkLista.add(i, link);
+				berriLista=berriLista2;
+				LinkLista.clear();
+				for (int i = 0; i < berriLista.size(); i++) {
+					String link = berriLista.get(i).getLink();
+					LinkLista.add(i, link);
+				}
+				adapter = new BerriaListAdapter(getActivity(),berriLista);
+				setListAdapter(adapter);
 			}
-			adapter = new BerriaListAdapter(getActivity(),berriLista);
-			setListAdapter(adapter);
-			
 			if (AlbisteFragment.this.isVisible()) {
 				getListView().setOnItemClickListener(AlbisteFragment.this);
 			}
-			}
+			
 			FragmentManager fm = getFragmentManager();
 			if (AlbisteFragment.this.isVisible()) {
 				AlbisteFragment fragment = (AlbisteFragment) fm
@@ -135,14 +135,15 @@ public class AlbisteFragment extends ListFragment implements
 		protected void onPreExecute() {
 			super.onPreExecute();
 			if(MainActivity.hasieran){
-			berriLista=new ArrayList<Berria>();
-			try {
-				LortuBerriakdb();
-			} catch (ParseException e) {
-				e.printStackTrace();
+				berriLista=new ArrayList<Berria>();
+				try {
+					LortuBerriakdb();
+				} catch (ParseException e) {
+					e.printStackTrace();
+				}
+				adapter = new BerriaListAdapter(getActivity(), berriLista);
+				setListAdapter(adapter);
 			}
-			adapter = new BerriaListAdapter(getActivity(), berriLista);
-			setListAdapter(adapter);}
 			dialog.setProgress(0);
 			dialog.setMax(100);
 			
@@ -154,7 +155,7 @@ public class AlbisteFragment extends ListFragment implements
 					String link = berriLista.get(i).getLink();
 					LinkLista.add(i, link);
 				}
-				if (AlbisteFragment.this.isAdded()) {
+				if (AlbisteFragment.this.isAdded()&&AlbisteFragment.this.isVisible()) {
 					getListView().setOnItemClickListener(AlbisteFragment.this);
 				}
 			// ///////////////////////////////////////////
@@ -184,36 +185,35 @@ public class AlbisteFragment extends ListFragment implements
 			}
 			ArrayList<Berria> albisteak = null;
 			try {
-				albisteak = db.getBerriak(saila);
-				dbEguneratzea = db.getEguneratzeData(saila);
+				albisteak = db.getBerriak(non);
+				dbEguneratzea = db.getEguneratzeData(non);
 				//System.out.println("dbEguneratzea1 "+dbEguneratzea );
-				
-				Date today=new Date();
-				SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd hh.mm");
-				int aurreratua = dbEguneratzea.compareTo(ft.format(today));
-			//	System.out.println("aurreratua1 "+aurreratua  );
-				if (aurreratua>0){//ondo>
-					String sEguna = dbEguneratzea.substring(8, 10);
-				//	System.out.println("sEguna1 "+sEguna  );
-					Integer e = Integer.valueOf(sEguna);
-					e--;
-					String se=e.toString();
-					if(e<10){
-						se="0"+se;
+				if(dbEguneratzea!=null){
+					Date today=new Date();
+					SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd HH.mm");
+					int aurreratua = dbEguneratzea.compareTo(ft.format(today));
+					//System.out.println("aurreratua1 "+aurreratua  );
+					if (aurreratua>0){//ondo>
+						String sEguna = dbEguneratzea.substring(8, 10);
+						//System.out.println("sEguna1 "+sEguna  );
+						Integer e = Integer.valueOf(sEguna);
+						e--;
+						String se=e.toString();
+						if(e<10){
+							se="0"+se;
+						}
+						//System.out.println("e1 "+e  );
+						dbEguneratzea=dbEguneratzea.substring(0, 8)+se+dbEguneratzea.substring(10,dbEguneratzea.length());
+						//	System.out.println("dbEguneratzea2 "+dbEguneratzea);
 					}
-				//	System.out.println("e1 "+e  );
-					dbEguneratzea=dbEguneratzea.substring(0, 8)+se+dbEguneratzea.substring(10,dbEguneratzea.length());
-				//	System.out.println("dbEguneratzea2 "+dbEguneratzea);
+				}else{
+					//db.setEguneratzeData("2015-01-01 00.00",saila);
+					dbEguneratzea="2015-01-01 00.00";
 				}
-				
 			} catch (SQLiteException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
 				e.printStackTrace();
-			}
-			if(dbEguneratzea==null){
-				db.setEguneratzeData("2015-01-01 00.00",saila);
-				dbEguneratzea="2015-01-01 00.00";
 			}
 			if (albisteak != null) {
 				MainActivity.albisteKop = albisteak.size();
@@ -237,7 +237,7 @@ public class AlbisteFragment extends ListFragment implements
 				}
 			}
 			try {
-				db.berriakHustu(saila);
+				db.berriakHustu(non);
 			} catch (SQLiteException e) {
 				e.printStackTrace();
 			}
@@ -247,7 +247,7 @@ public class AlbisteFragment extends ListFragment implements
 			URL imageUrl = null;
 			HttpURLConnection conn = null;
 			try {
-				imageUrl = new URL("http://www.naiz.eus/images/logo.png");
+				imageUrl = new URL(logoUrl);
 				conn = (HttpURLConnection) imageUrl.openConnection();
 				conn.connect();
 				BitmapFactory.Options options = new BitmapFactory.Options();
@@ -283,29 +283,31 @@ public class AlbisteFragment extends ListFragment implements
 				System.out.println("dbEguneratzea "+ dbEguneratzea);
 				Date today=new Date();
 				SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd");
-				
-				naizEguneratzea = ft.format(today)+" "+naizEguneratzea;
+				if (naizEguneratzea == "" || naizEguneratzea == null){
+					naizEguneratzea = "2015-01-01 00.01";
+				}else{
+					naizEguneratzea = ft.format(today) + " " + naizEguneratzea;
+				}
 				//System.out.println("Current Date: " + ft.format(today));
 				int s = dbEguneratzea.compareTo(naizEguneratzea);
 				System.out.println("s: "+s+" dbEguneratzea:"+dbEguneratzea+" naizEguneratzea"+naizEguneratzea);
 				
-				if(s<0||(saila!="azala")){
+				if(s<0){
 					System.out.println("sBARRU: "+s+" dbEguneratzea:"+dbEguneratzea+" naizEguneratzea"+naizEguneratzea);
 					eguneratuBeharra=true;
-					db.setEguneratzeData(naizEguneratzea,saila);
-					if (MainActivity.hasieran){
+					
 					berriTaulaHustu();
-					}
 				Elements albisteak = doc.select("div.article");
-				// menuan kopurua ezarri
-				MainActivity.albisteKop = albisteak.size();
-				if (AlbisteFragment.this.isVisible()) {
-					String[] navMenuTitles = getResources().getStringArray(
-							R.array.nav_drawer_items);
-					MainActivity.navDrawerItems.set(0, new NavDrawerItem(
-							navMenuTitles[0], R.drawable.ic_home, true,
-							(Integer.toString(albisteak.size()))));
-				}
+				db.setEguneratzeData(naizEguneratzea,non,albisteak.size());
+				//TODO menuan kopurua ezarri
+//				MainActivity.albisteKop = albisteak.size();
+//				if (AlbisteFragment.this.isVisible()) {
+//					String[] navMenuTitles = getResources().getStringArray(
+//							R.array.nav_drawer_items);
+//					MainActivity.navDrawerItems.set(0, new NavDrawerItem(
+//							navMenuTitles[0], R.drawable.ic_launcher, true,
+//							(Integer.toString(albisteak.size()))));
+//				}
 
 				for (int i = 0; i < albisteak.size(); i++) {
 					publishProgress((Integer) ((100 / albisteak.size()) * i));
@@ -359,7 +361,7 @@ public class AlbisteFragment extends ListFragment implements
 					String Info = albiste_info.text();
 					p.setExtraInfo(Info);
 
-					String text_albiste_saila = saila;
+					String text_albiste_saila = "";//TODO sailarena hemen gaizki zegoen?
 					if (albiste_saila.first() != null) {
 						text_albiste_saila = albiste_saila.first().text();
 					}
@@ -378,13 +380,15 @@ public class AlbisteFragment extends ListFragment implements
 						}
 						p.setSailLinka(weba + albiste_linka);
 					}
+					
 					berriLista2.add(p);
 					 ByteArrayOutputStream stream = new ByteArrayOutputStream();
 					 if (bm!=null){
-					 bm.compress(CompressFormat.PNG, 0, stream);}
+					 bm.compress(CompressFormat.PNG, 0, stream);
+					 }
 					try {
-						System.out.println("db.SartuBerriaOK: "+p.getTitle());
-						db.SartuBerria(saila,text_a_izena, text_albiste_desk, Info, text_albiste_saila, "", stream.toByteArray(), p.getLink(),p.getSailLinka());
+						System.out.println("db.SartuBerriaOK: non: "+non+", "+p.getTitle());
+						db.SartuBerria(non,text_a_izena, text_albiste_desk, Info, text_albiste_saila, "", stream.toByteArray(), p.getLink(),p.getSailLinka());
 					} catch (SQLiteException e) {
 						System.out.println("db.SartuBerria1: "+e.getMessage());
 						e.printStackTrace();
@@ -406,18 +410,15 @@ public class AlbisteFragment extends ListFragment implements
 	}
 
 	@Override
-	public void onItemClick(AdapterView<?> parent, View view, int position,
-			long id) {
+	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 		// System.out.println("AlbisteFragment - onItemClick:linklista.size="+LinkLista.size());
 		MainActivity.hasieran = false;
 		String link = berriLista.get(position).getLink();
 		if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.GINGERBREAD_MR1) {
-			FragmentManager fragmentManager = getActivity()
-					.getSupportFragmentManager();
-			fragmentManager
-					.beginTransaction()
-					.replace(R.id.frame_container,
-							AlbisteBatFragment.newInstance(link)).commit();
+			FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+			fragmentManager.beginTransaction()
+					.replace(R.id.frame_container,AlbisteBatFragment.newInstance(link))
+					.commit();
 		} else {
 			Sample s = new Sample(R.string.titulua, ScreenSlideActivity.class);
 			Intent i = new Intent(getActivity(), s.activityClass);
@@ -427,8 +428,8 @@ public class AlbisteFragment extends ListFragment implements
 		}
 	}
 
-	public static Fragment newInstance(String tit, String link) {
-		AlbisteFragment fragment = new AlbisteFragment(tit, link);
+	public static Fragment newInstance(String tit, String link,String img) {
+		AlbisteFragment fragment = new AlbisteFragment(tit, link,img);
 		return fragment;
 	}
 

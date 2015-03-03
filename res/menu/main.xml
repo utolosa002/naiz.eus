@@ -2,25 +2,26 @@
 
     <item
         android:id="@+id/action_login"
-        android:orderInCategory="100"
+        android:orderInCategory="102"
     	android:showAsAction="ifRoom"
         android:title="@string/login_menu"
         android:icon="@drawable/ic_action_person"/>
-  <!--   <item
-        android:id="@+id/action_share"
+    <item
+        android:id="@+id/action_refresh"
         android:orderInCategory="101"
     	android:showAsAction="ifRoom"
-        android:title="@string/action_share"
-        android:icon="@drawable/ic_action_share"/>--> 
+        android:title="@string/action_refresh"
+        android:icon="@drawable/ic_action_refresh"/>
     <item
-        android:id="@+id/action_favorites"
-        android:orderInCategory="102"
+        android:id="@+id/action_add_favorites"
+        android:orderInCategory="100"
     	android:showAsAction="ifRoom"
-        android:title="@string/favorites_menu"
-        android:icon="@drawable/ic_action_favorite"/>
+        android:title="@string/add_favorites_menu"
+        android:icon="@drawable/ic_action_not_important"/>
     <item
     android:id="@+id/action_textsize_seekbar"
     android:showAsAction="never"
     android:title="@string/testsize_menu"
-    android:actionViewClass="android.widget.SeekBar"/>
+    android:actionViewClass="android.widget.SeekBar"
+    android:icon="@drawable/ic_action_sort_by_size"/>
 </menu>

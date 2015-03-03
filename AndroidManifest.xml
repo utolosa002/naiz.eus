@@ -44,10 +44,6 @@
             android:name="com.naiz.eus.ScreenSlideActivity"
             android:label="@string/app_name" >
 		</activity>
-		<activity
-            android:name="com.naiz.eus.FavActivity"
-            android:label="@string/app_name" >
-		</activity>
 		<receiver android:name="com.naiz.eus.widget.PhoneBootCompleteReceiver" >
 			<intent-filter>
 				<action android:name="android.intent.action.BOOT_COMPLETED" />

@@ -162,6 +162,10 @@ public class AlbisteBatFragment extends Fragment{
     		}else if(berriaGara.first()!=null){
     			html_berria = berriaGara.first().outerHtml();
     		}
+    		if (html_berria==null||html_berria==""){
+                Elements erosi = doc.select("div[class*=span-6 last]");
+                html_berria = erosi.first().outerHtml();
+    		}
     		b.setBerria(html_berria);
     		}
 	

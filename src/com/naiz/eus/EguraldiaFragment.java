@@ -77,10 +77,9 @@ public class EguraldiaFragment extends ListFragment implements
 	}
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
-		View rootView = inflater.inflate(R.layout.fragment_eguraldi_orok,
-				container, false);
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		View rootView = inflater.inflate(R.layout.fragment_eguraldi_orok, container, false);
+		setHasOptionsMenu(true);
 		webView = (WebView) rootView.findViewById(R.id.webVieweguraldiorok);
 		TitView = (TextView) rootView.findViewById(R.id.txtLabela);
 		logoa = (ImageView) rootView.findViewById(R.id.img_logo);
@@ -105,16 +104,16 @@ public class EguraldiaFragment extends ListFragment implements
 	}
 
 	private class AsinkTask extends AsyncTask<URL, Integer, Long> {
-		// private ProgressDialog dialog = new
-		// ProgressDialog(EguraldiaFragment.this.getActivity());
-
-		
+		 private ProgressDialog dialog = new ProgressDialog(EguraldiaFragment.this.getActivity());	
 
 		@Override
 		protected void onPostExecute(Long result) {
 			super.onPostExecute(result);
 			if (EguraldiaFragment.this.getActivity() == null)
 				return;
+			if (dialog.isShowing()) {
+				dialog.dismiss();
+			}
 			kargatuSpinnerEntzulea();
 			System.out.println("Post: Spinner kargatua");
 
@@ -126,7 +125,9 @@ public class EguraldiaFragment extends ListFragment implements
 			settings.setDefaultTextEncodingName("utf-8");
 			webView.getSettings().setJavaScriptEnabled(true);
 			webView.setWebViewClient(new WebViewClient());
-			html = html.replaceAll("=\"/", "=\"http://www.naiz.eus/");
+			if(html!=null){
+				html = html.replaceAll("=\"/", "=\"http://www.naiz.eus/");
+			}
 			webView.loadDataWithBaseURL("file:///android_asset/", html,
 					"text/html", "utf-8", null);
 
@@ -154,7 +155,7 @@ public class EguraldiaFragment extends ListFragment implements
 			herriListLista.add(null);
 			herrialdeLista.add("nafarroa");
 			herriListLista.add(null);
-			herrialdeLista.add("nafarroa behera");
+			herrialdeLista.add("nafarroa-beherea");
 			herriListLista.add(null);
 			herrialdeLista.add("zuberoa");
 			herriListLista.add(null);
@@ -166,10 +167,15 @@ public class EguraldiaFragment extends ListFragment implements
 			ArrayAdapter<?> spinneradapter = ArrayAdapter.createFromResource(
 					getActivity(), R.array.herrialdespinnerItems,
 					android.R.layout.simple_spinner_item);
-			spinneradapter
-					.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+			spinneradapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 			s.setAdapter(spinneradapter);
 			s.setSelection(pos);
+
+	        dialog.setMessage("Herriak lortzen...");
+	    	dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+			dialog.setProgress(0);
+			dialog.setMax(100);
+	        dialog.show();
 			try {
 				selectHerriakDB();
 			} catch (ParseException | IOException e) {
@@ -240,72 +246,91 @@ public class EguraldiaFragment extends ListFragment implements
 //						titularra = titu.get(0).text();// lista osoaren titulua
 //														// ezarri
 //					}
-					Elements herrilista = null;
-					///////////
-					int l = 0;
-					while (l < 20 && (docarab == null || docgip == null
-									|| docbizk == null || doclapu == null
-									|| docnafa == null || docnafb == null || doczub == null)) {
-						docarab = Jsoup.connect(searchURL + "/araba").get();
-						docgip = Jsoup.connect(searchURL + "/gipuzkoa").get();
-						docbizk = Jsoup.connect(searchURL + "/bizkaia").get();
-						doclapu = Jsoup.connect(searchURL + "/lapurdi").get();
-						docnafa = Jsoup.connect(searchURL + "/nafarroa").get();
-						docnafb = Jsoup
-								.connect(searchURL + "/nafarroa-beherea").get();
-						doczub = Jsoup.connect(searchURL + "/zuberoa").get();
-						l++;
-					}
-					///////////////////
-					for(int pro=0;pro<7;pro++){
-						if (herriListLista.get(pro) == null) {
-						
-					switch (pro) {
-					case (0):
-						if (docarab != null) {
-							herrilista = docarab
-									.select("select[id*=weather_location_selector]");
-							System.out.println("docarab");
-						} else {
-							herrilista = doc
-									.select("select[id*=weather_location_selector]");
-							System.out.println("doc");
+				Elements herrilista = null;
+				///////////////////
+				for(int pro=0;pro<7;pro++){
+					if (herriListLista.get(pro) == null) {
+						int l = 0;
+						switch (pro) {
+							case (0):
+								while (l < 20 && docarab == null) {
+									docarab = Jsoup.connect(searchURL + "/araba").get();
+									l++;
+								}
+								if (docarab != null) {
+									herrilista = docarab.select("select[id*=weather_location_selector]");
+								}
+								System.out.println("docarab");
+								break;
+							case (1):
+								while (l < 20 && docbizk == null) {
+									docbizk = Jsoup.connect(searchURL + "/bizkaia").get();
+									l++;
+								}
+								if (docbizk != null) {
+									herrilista = docbizk.select("select[id*=weather_location_selector]");
+								}
+								System.out.println("docbizk");
+								break;
+							case (2):
+								while (l < 20 && docgip == null) {
+									docgip = Jsoup.connect(searchURL + "/gipuzkoa").get();
+									l++;
+								}
+								if (docgip != null) {
+									herrilista = docgip.select("select[id*=weather_location_selector]");
+								}
+								break;
+							case (3):
+								while (l < 20 && doclapu == null) {
+									doclapu = Jsoup.connect(searchURL + "/lapurdi").get();
+									l++;
+								}
+								if (doclapu != null) {
+									herrilista = doclapu.select("select[id*=weather_location_selector]");
+								}
+								break;
+					case (4):
+						while (l < 20 && docnafa == null) {
+							docnafa = Jsoup.connect(searchURL + "/nafarroa").get();
+							l++;
+						}
+						if (docnafa != null) {
+							herrilista = docnafa.select("select[id*=weather_location_selector]");
 						}
 						break;
-					case (1):
-						System.out.println("docarab");
-						herrilista = docbizk
-								.select("select[id*=weather_location_selector]");
-						break;
-					case (2):
-						herrilista = docgip
-								.select("select[id*=weather_location_selector]");
-						break;
-					case (3):
-						herrilista = doclapu
-								.select("select[id*=weather_location_selector]");
-						break;
-					case (4):
-						herrilista = docnafa
-								.select("select[id*=weather_location_selector]");
-						break;
 					case (5):
-						herrilista = docnafb
-								.select("select[id*=weather_location_selector]");
+						while (l < 20 && docnafb == null) {
+							docnafb = Jsoup.connect(searchURL + "/nafarroa-beherea").get();
+							l++;
+						}
+						if (docnafb != null) {
+							herrilista = docnafb.select("select[id*=weather_location_selector]");
+						}
 						break;
 					case (6):
-						herrilista = doczub
-								.select("select[id*=weather_location_selector]");
+						while (l < 20 && doczub == null) {
+							doczub = Jsoup.connect(searchURL + "/zuberoa").get();
+							l++;
+						}
+						if (doczub != null) {
+							herrilista = doczub.select("select[id*=weather_location_selector]");
+						}
 						break;
 					default:
-						herrilista = doc
-								.select("select[id*=weather_location_selector]");
+						while (l < 20 && doc == null) {
+							doc = Jsoup.connect(searchURL).get();
+							l++;
+						}
+						if (doc != null) {
+							herrilista = doc.select("select[id*=weather_location_selector]");
+						}
 						break;
 					}
 					Elements herriak = herrilista.select("option");
 					 herriLista=new ArrayList<Saila>();
 					for (int i = 1; i < herriak.size(); i++) {
-						// publishProgress((Integer)((100/herriak.size())*i));
+						publishProgress((Integer)((100/herriak.size())*i));
 						Saila sail = new Saila();
 						sail.setTit(herriak.get(i).text());
 						String sherri = herriak.get(i).attr("data-url");
@@ -315,6 +340,7 @@ public class EguraldiaFragment extends ListFragment implements
 								+ herriLista.get(i-1).getTit());
 
 					}
+					publishProgress((Integer)((100/herriListLista.size())*pro));
 					herriListLista.set(pro, herriLista);
 					System.out.println("INSERT herrialde bat ");
 					insertHerriakDB(herrialdeLista.get(pro), herriLista);
@@ -367,13 +393,13 @@ public class EguraldiaFragment extends ListFragment implements
 			}
 			return null;
 		}
-		// @Override
-		// protected void onProgressUpdate(Integer... progress) {
-		// super.onProgressUpdate(progress);
-		// if (dialog != null) {
-		// dialog.setProgress(progress[0]);
-		// }
-		// }
+		 @Override
+		 protected void onProgressUpdate(Integer... progress) {
+			 super.onProgressUpdate(progress);
+			 if (dialog != null) {
+				 dialog.setProgress(progress[0]);
+			 }
+		 }
 	}
 
 	@Override
@@ -382,12 +408,14 @@ public class EguraldiaFragment extends ListFragment implements
 		// String link = searchURL+"/"+herrialdea+"/"+herria;
 		String link = herriListLista.get(pos).get(position).getLink();
 		MainActivity.hasieran = false;
+		MainActivity.herrian = true;
+		MainActivity.unekoHerria = herriListLista.get(pos).get(position).getTit();
 		FragmentManager fragmentManager = getActivity()
 				.getSupportFragmentManager();
 		fragmentManager
 				.beginTransaction()
 				.replace(R.id.frame_container,
-						EguraldiBatFragment.newInstance(link)).commit();
+						EguraldiBatFragment.newInstance(link.toLowerCase())).commit();
 	}
 
 	public void kargatuSpinnerEntzulea() {

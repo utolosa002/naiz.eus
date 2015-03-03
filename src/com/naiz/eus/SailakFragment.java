@@ -1,13 +1,8 @@
 package com.naiz.eus;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.select.Elements;
 
 import com.naiz.eus.R;
 import com.naiz.eus.adapter.SailListAdapter;
@@ -28,7 +23,7 @@ import android.widget.AdapterView.OnItemClickListener;
 
 public class SailakFragment extends ListFragment implements OnItemClickListener {
 
-	private static String searchURL;
+//	private static String searchURL;
     private List<Saila> sailLista;
     Bundle savedInstanceState1;
     
@@ -41,7 +36,7 @@ public class SailakFragment extends ListFragment implements OnItemClickListener 
         View rootView = inflater.inflate(R.layout.fragment_sailak, container, false);
 		final TextView titView = (TextView) rootView.findViewById(R.id.txt_fg_sailak);
 		savedInstanceState1= savedInstanceState;
-		searchURL="http://www.naiz.eus/eu/";
+		//searchURL="http://www.naiz.eus/eu/";
 		sailLista= new ArrayList<Saila>();
 		titView.setText("Sailak");
 
@@ -51,10 +46,6 @@ public class SailakFragment extends ListFragment implements OnItemClickListener 
 		
         return rootView;
     }
-	
-	
-	
-	
 	
 	private class AsinkTask extends AsyncTask<URL, Integer, Long> {
 		 private ProgressDialog dialog = new ProgressDialog(SailakFragment.this.getActivity());
@@ -150,7 +141,6 @@ public class SailakFragment extends ListFragment implements OnItemClickListener 
 //   			try {
 //				doInBackground(new URL(null));
 //			} catch (IOException e) {
-//				// TODO Auto-generated catch block
 //				System.out.println("errorea sailak lortzean2");
 //				e.printStackTrace();
 //			}
@@ -177,9 +167,11 @@ public class SailakFragment extends ListFragment implements OnItemClickListener 
 			long id) {
 		String saila = sailLista.get(position).getTit();
 		String link = sailLista.get(position).getLink();
+		MainActivity.saila=saila;
+		MainActivity.searchURL=link;
 		  FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
     	 fragmentManager.beginTransaction()
-		     .replace(R.id.frame_container, AlbisteFragment.newInstance(saila,link))
+		     .replace(R.id.frame_container, AlbisteFragment.newInstance(saila,link,null))
 		     .commit();
 	}
 	public static Fragment newInstance() {

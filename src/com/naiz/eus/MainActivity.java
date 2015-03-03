@@ -43,6 +43,7 @@ import android.webkit.WebSettings;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SeekBar;
+import android.widget.Toast;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 
 @SuppressLint("NewApi")//11 api onartzen du, 10 ez
@@ -63,9 +64,15 @@ public class MainActivity extends FragmentActivity {
 	public static int albisteKop = 0;
 	public static ArrayList<NavDrawerItem> navDrawerItems;
 	private NavDrawerListAdapter adapter;
-	private String searchURL;
+	public static String searchURL="http://www.naiz.eus/";
 	public static boolean hasieran;
+	public static boolean herrian=false;
+	public static String saila;
+	public static String unekoHerria="";
 	public static int testutamaina=15;
+	DatabaseHandler db = new DatabaseHandler(this);
+	private String img;
+	Menu menua;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -97,7 +104,6 @@ public class MainActivity extends FragmentActivity {
 		intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS,ids);
 		sendBroadcast(intent);
 		//////////////////////DB///////////////////////
-		DatabaseHandler db = new DatabaseHandler(this);
 		try {
 			db.createDataBase();
 			db.close();
@@ -119,21 +125,31 @@ public class MainActivity extends FragmentActivity {
 		}
 		// Home
 		navDrawerItems.add(new NavDrawerItem(navMenuTitles[0], navMenuIcons.getResourceId(0, -1),true, Integer.toString(albkop)));
-		// Iritzia
-		navDrawerItems.add(new NavDrawerItem(navMenuTitles[1], navMenuIcons.getResourceId(1, -1), true, "50+"));
-		// naiz+
-		navDrawerItems.add(new NavDrawerItem(navMenuTitles[2], navMenuIcons.getResourceId(2, -1), true, "22"));
-		// Agenda
+		//Gara
+		navDrawerItems.add(new NavDrawerItem(navMenuTitles[1], navMenuIcons.getResourceId(1, -1) ));//, true, "50+"));
+		//Gaur8
+		navDrawerItems.add(new NavDrawerItem(navMenuTitles[2], navMenuIcons.getResourceId(2, -1)));
+		//Kazeta
 		navDrawerItems.add(new NavDrawerItem(navMenuTitles[3], navMenuIcons.getResourceId(3, -1)));
-		// Sailak
+		//mediabask
 		navDrawerItems.add(new NavDrawerItem(navMenuTitles[4], navMenuIcons.getResourceId(4, -1)));
-		// Blogak
+		// Sailak
 		navDrawerItems.add(new NavDrawerItem(navMenuTitles[5], navMenuIcons.getResourceId(5, -1)));
 		// Eguraldia
 		navDrawerItems.add(new NavDrawerItem(navMenuTitles[6], navMenuIcons.getResourceId(6, -1)));
+		// Gogokoak
+		navDrawerItems.add(new NavDrawerItem(navMenuTitles[7], navMenuIcons.getResourceId(7, -1)));
+		// Blogak
+		navDrawerItems.add(new NavDrawerItem(navMenuTitles[8], navMenuIcons.getResourceId(8, -1)));
+		// Iritzia
+		navDrawerItems.add(new NavDrawerItem(navMenuTitles[9], navMenuIcons.getResourceId(9, -1)));
+		// naiz+
+		navDrawerItems.add(new NavDrawerItem(navMenuTitles[10], navMenuIcons.getResourceId(10, -1)));
+		// Agenda
+		navDrawerItems.add(new NavDrawerItem(navMenuTitles[11], navMenuIcons.getResourceId(11, -1)));
 		// Sartu
-		navDrawerItems.add(new NavDrawerItem(navMenuTitles[7], navMenuIcons.getResourceId(4, -1)));
-		
+		navDrawerItems.add(new NavDrawerItem(navMenuTitles[12], navMenuIcons.getResourceId(12, -1)));
+				
 
 		// Recycle the typed array
 		navMenuIcons.recycle();
@@ -189,7 +205,7 @@ public class MainActivity extends FragmentActivity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.main, menu);
-		
+		menua=menu;
 		return true;
 	}
 
@@ -264,11 +280,39 @@ public class MainActivity extends FragmentActivity {
 			});
 			builder2.show();
 			return true;
-			case R.id.action_favorites:
-				Intent i = new Intent(this,FavActivity.class);
-//				i.putStringArrayListExtra("Linkak", LinkLista);
-//				i.putExtra("pos", position);
-				startActivity(i);
+		case R.id.action_add_favorites:
+			db.changeFavHerria(unekoHerria);
+			if(db.isFav(unekoHerria)){
+				System.out.println(unekoHerria+"db.isFav(unekoHerria)"+db.isFav(unekoHerria));
+				menua.findItem(R.id.action_add_favorites).setIcon(R.drawable.ic_action_important);
+			}else{
+				System.out.println(unekoHerria+"db.isnotFav(unekoHerria)"+db.isFav(unekoHerria));
+				menua.findItem(R.id.action_add_favorites).setIcon(R.drawable.ic_action_not_important);
+			}
+			return true;
+		case R.id.action_refresh:
+			DatabaseHandler db = new DatabaseHandler(this);
+			try {
+				db.createDataBase();
+				db.close();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+				System.out.println("gaizki db");
+			}
+			try {
+				db.setEguneratzeData("2015-00-00 00.00",saila,MainActivity.albisteKop);
+			} catch (SQLiteException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			AlbisteFragment fragment = new AlbisteFragment(saila, searchURL,img);
+			if (saila=="azala"){
+        	hasieran=true;}
+        	if (fragment != null) {
+				FragmentManager fragmentManager = getSupportFragmentManager();
+				fragmentManager.beginTransaction().replace(R.id.frame_container, fragment).commit();
+			}
 				return true;
 		default:
 			return super.onOptionsItemSelected(item);
@@ -284,6 +328,18 @@ public class MainActivity extends FragmentActivity {
 		boolean drawerOpen = mDrawerLayout.isDrawerOpen(mDrawerList);
 		menu.findItem(R.id.action_login).setVisible(!drawerOpen);
 		menu.findItem(R.id.action_textsize_seekbar).setVisible(!drawerOpen);
+		menu.findItem(R.id.action_textsize_seekbar).setVisible(!herrian);
+		menu.findItem(R.id.action_add_favorites).setVisible(herrian);
+		if(db.isFav(unekoHerria)){
+			System.out.println(unekoHerria+"db1.isFav(unekoHerria)"+db.isFav(unekoHerria));
+			menua.findItem(R.id.action_add_favorites).setIcon(R.drawable.ic_action_important);
+		}else{
+			System.out.println(unekoHerria+"db1.isnotFav(unekoHerria)"+db.isFav(unekoHerria));
+			menua.findItem(R.id.action_add_favorites).setIcon(R.drawable.ic_action_not_important);
+		}
+		menu.findItem(R.id.action_refresh).setVisible(!drawerOpen);
+		menu.findItem(R.id.action_refresh).setVisible(hasieran);
+		menu.findItem(R.id.action_refresh).setVisible(!herrian);
 	//	menu.findItem(R.menu.main).setVisible(false);
 		return super.onPrepareOptionsMenu(menu);
 
@@ -291,10 +347,18 @@ public class MainActivity extends FragmentActivity {
 	}
 	@Override
 	public void onBackPressed() {
-		Fragment fragment = new AlbisteFragment();
+		
 		if(!hasieran){
-			if (fragment != null) {
+			Fragment fragment;
+			if(herrian){
+				fragment = new EguraldiaFragment();
+				hasieran=false;
+			}else{
+				fragment = new AlbisteFragment();
 				hasieran=true;
+			}
+			if (fragment != null) {
+				herrian=false;
 				FragmentManager fragmentManager = getSupportFragmentManager();
 				fragmentManager.beginTransaction().replace(R.id.frame_container, fragment).commit();
 			}
@@ -315,36 +379,81 @@ public class MainActivity extends FragmentActivity {
 //	        	fragment = new LoliAlbisteFragment();
 //	        	hasieran=true;
 //			}else{
-				fragment = new AlbisteFragment();
-	        	hasieran=true;
+			saila="azala";
+        	hasieran=true;
+        	herrian = false;
+        	searchURL="http://www.naiz.eus/";
+        	img="http://www.naiz.eus/images/logo.png";
+        	fragment = new AlbisteFragment("azala",searchURL,img);
 //			}
 			break;
+
 		case 1:
-			String link1 = "http://www.naiz.eus/eu/iritzia";
-			fragment = new WebViewFragment(link1);
-			break;
+			saila="gara";
+        	searchURL="http://www.naiz.eus/hemeroteca/gara";
+        	img="http://www.naiz.eus/media/asset_publics/resources/000/037/726/original/GARA_EUS.png";
+        	herrian = false;
+        	fragment = new AlbisteFragment("gara",searchURL,img);
+		break;
 		case 2:
-			String link2 = "http://www.naiz.eus/eu/naizplus";
-			fragment = new WebViewFragment(link2);
-			break;
+			saila="gaur8";
+        	searchURL="http://www.naiz.eus/hemeroteca/gaur8";
+        	img="http://www.naiz.eus/media/asset_publics/resources/000/135/174/original/G8.png";
+        	herrian = false;
+        	fragment = new AlbisteFragment("gaur8",searchURL,img);
+		break;
 		case 3:
-			String link3 = "http://www.naiz.eus/eu/agenda";
-			fragment = new WebViewFragment(link3);
-			break;
+			saila="kazeta";
+        	searchURL="http://kazeta.naiz.eus/eu";
+        	img="http://kazeta.naiz.eus/media/asset_publics/resources/000/135/205/original/kazeta.png";
+        	herrian = false;
+        	fragment = new AlbisteFragment("kazeta",searchURL,img);
+		break;
 		case 4:
-			fragment = new SailakFragment();
-			break;
+			saila="mediabask";
+        	img="http://mediabask.naiz.eus/media/asset_publics/resources/000/135/808/original/logo_mediabask.png";
+        	searchURL="http://mediabask.naiz.eus/eu";
+        	herrian = false;
+        	fragment = new AlbisteFragment("mediabask",searchURL,img);
+		break;
 		case 5:
-			fragment = new BlogakFragment();
+			herrian = false;
+        	fragment = new SailakFragment();
 			break;
 		case 6:
-			fragment = new EguraldiaFragment();
+			herrian = false;
+        	fragment = new EguraldiaFragment();
 			break;
 		case 7:
+			herrian = false;
+        	fragment = new FavFragment();
+			break;
+		case 8:
+			herrian = false;
+        	fragment = new BlogakFragment("http://www.naiz.eus/eu/iritzia/blogs");
+			break;
+		case 9:
+			String link1 = "http://www.naiz.eus/eu/iritzia";
+			herrian = false;
+        	fragment = new IritziaFragment(link1);
+			break;
+		case 10:
+			String link2 = "http://www.naiz.eus/eu/naizplus";
+			herrian = false;
+        	fragment = new WebViewFragment(link2);
+			break;
+		case 11:
+			String link3 = "http://www.naiz.eus/eu/agenda";
+			herrian = false;
+        	fragment = new WebViewFragment(link3);
+			break;
+		case 12:
 			String link6 = "http://www.naiz.eus/eu/suscripcion/entrar";
 			//fragment = new WebViewFragment(link6);
-			fragment = new HarpidetzaFragment();
+			herrian = false;
+        	fragment = new HarpidetzaFragment();
 			break;
+
 		default:
 			break;
 		}

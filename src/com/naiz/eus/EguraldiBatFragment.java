@@ -42,14 +42,13 @@ public class EguraldiBatFragment extends Fragment {
 	public EguraldiBatFragment(){}
 	
 	public EguraldiBatFragment(String link) {
-	// TODO Auto-generated constructor stub
 		 searchURL=link;
-}
+	}
 
 	@Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
- 
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		
+		MainActivity.herrian = true;
         View rootView = inflater.inflate(R.layout.fragment_webview, container, false);
 		webView = (WebView) rootView.findViewById(R.id.webView1);
 		titView = (TextView) rootView.findViewById(R.id.txtLabel);
@@ -79,7 +78,7 @@ public class EguraldiBatFragment extends Fragment {
 		        if (EguraldiBatFragment.this.getActivity() == null)
 	                return;
 		        if (dialog.isShowing()){
-		        dialog.dismiss();
+		        	dialog.dismiss();
 		        }
 		        titView.setText(titulua);
 				WebSettings settings = webView.getSettings();
@@ -143,7 +142,7 @@ public class EguraldiBatFragment extends Fragment {
 	    		System.out.println("errorea albisteak lortzean");
      			try {
      				doInBackground(new URL(null));
-  				} catch (IOException e) {// TODO Auto-generated catch block
+  				} catch (IOException e) {
   					System.out.println("errorea albisteak lortzean2");
   					e.printStackTrace();
   				}

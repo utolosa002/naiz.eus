@@ -11,6 +11,8 @@
         android:layout_alignParentLeft="true"
         android:layout_marginLeft="12dp"
         android:layout_marginRight="12dp"
+        android:minHeight="50dp"
+        android:minWidth="40dp"
         android:contentDescription="@string/desc_list_item_icon"
         android:src="@drawable/ic_home"
         android:layout_centerVertical="true" />

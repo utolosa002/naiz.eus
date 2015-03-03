@@ -108,7 +108,6 @@ public class DatabaseHandler extends SQLiteOpenHelper{
                System.out.println("Copying upgrade database...");
                copyDataBase();
             } catch (IOException e) {
-                // TODO Auto-generated catch block
             	System.out.println("upgrade database catch..."); 
                 e.printStackTrace();
             }       
@@ -117,7 +116,7 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 	public ArrayList<Berria> getBerriak(String saila)  throws IOException, SQLiteException {
 		ArrayList<Berria> BerriList = new ArrayList<Berria>();
 		SQLiteDatabase db = this.getReadableDatabase();
-		String selectQuery = "SELECT  * FROM " + TABLE_BERRIAK +" WHERE saila='"+saila+"'";
+		String selectQuery = "SELECT * FROM " + TABLE_BERRIAK +" WHERE saila='"+saila+"'";
 		//System.out.println(selectQuery);
 		Cursor cursor = db.rawQuery(selectQuery, null);
 		int kont=0;
@@ -128,10 +127,17 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 				Berria.setSubtitle(cursor.getString(1));
 				Berria.setExtraInfo(cursor.getString(2));
 				Berria.setSaila(cursor.getString(3));
-				Berria.setBerria(cursor.getString(4));
+				if (!(cursor.getString(4).isEmpty())){
+					Berria.setBerria(cursor.getString(4));
+					System.out.println("not empty berria"+cursor.getString(4));
+				}else{
+					Berria.setBerria("");
+					System.out.println("empty berria"+cursor.getString(4));
+				}
 				Berria.setImage(BitmapFactory.decodeByteArray(cursor.getBlob(5), 0, cursor.getBlob(5).length));
 				Berria.setLink(cursor.getString(6));
 				Berria.setSailLinka(cursor.getString(7));
+				Berria.setNon(cursor.getString(8));
 				// Adding hondakin to list
 				BerriList.add(Berria);
 				kont++;
@@ -144,7 +150,7 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 	public Berria getBerria(String link)  throws IOException, SQLiteException {
 		ArrayList<Berria> BerriList = new ArrayList<Berria>();
 		SQLiteDatabase db = this.getReadableDatabase();
-		String selectQuery = "SELECT  * FROM " + TABLE_BERRIAK +" WHERE link='"+link+"'";
+		String selectQuery = "SELECT * FROM " + TABLE_BERRIAK +" WHERE link='"+link+"'";
 		//System.out.println(selectQuery);
 		Cursor cursor = db.rawQuery(selectQuery, null);
 		Berria Berria = new Berria();
@@ -154,10 +160,17 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 				Berria.setSubtitle(cursor.getString(1));
 				Berria.setExtraInfo(cursor.getString(2));
 				Berria.setSaila(cursor.getString(3));
-				Berria.setBerria(cursor.getString(4));
+				if (!(cursor.getString(4).isEmpty())){
+					Berria.setBerria(cursor.getString(4));
+					System.out.println("not empty berria"+cursor.getString(4));
+				}else{
+					Berria.setBerria("");
+					System.out.println("empty berria"+cursor.getString(4));
+				}
 				Berria.setImage(BitmapFactory.decodeByteArray(cursor.getBlob(5), 0, cursor.getBlob(5).length));
 				Berria.setLink(cursor.getString(6));
 				Berria.setSailLinka(cursor.getString(7));
+				Berria.setNon(cursor.getString(8));
 			} while (cursor.moveToNext());
 		}
 		System.out.println("berrilist"+BerriList.size());
@@ -187,7 +200,7 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 //		return hondakinList;
 //	}
 	
-	public void SartuBerria(String saila,String tit,String subtit,String extra,String section,String text,byte[] media,String link,String sectionlink) throws IOException,SQLiteException {
+	public void SartuBerria(String non,String tit,String subtit,String extra,String section,String text,byte[] media,String link,String sectionlink) throws IOException,SQLiteException {
 		
  		SQLiteDatabase db = this.getWritableDatabase();
 		//String selectQuery = "INSERT INTO `berriak` (`tit`, `subtit`, `extra`, `section`, `text`, `media`, `link`, `sectionlink`) VALUES"
@@ -201,7 +214,7 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 		values.put("media",media);
 		values.put("link",link);
 		values.put("sectionlink",sectionlink);
-		values.put("saila",saila);
+		values.put("saila",non);
 		
 		db.insert("berriak", null,values);
 
@@ -213,16 +226,9 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 		}
 	}
 
-	@Override
-	public void onCreate(SQLiteDatabase db) {
-		// TODO Auto-generated method stub
-		
-	}
-
 	public void berriakHustu(String saila) {
-		// TODO Auto-generated method stub
 		SQLiteDatabase db = this.getWritableDatabase();
-		String sql = "DELETE FROM "+TABLE_BERRIAK+" WHERE saila='"+saila+"' ";
+		String sql = "DELETE FROM '"+TABLE_BERRIAK+"' WHERE saila='"+saila+"' ";
 		db.execSQL(sql);
 	}
 
@@ -230,7 +236,7 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 		SQLiteDatabase db = this.getReadableDatabase();
 		String selectQuery = "SELECT date FROM '" + TABLE_EGUNERAKETA +"' WHERE saila='"+saila+"' LIMIT 1";
 
-		System.out.println("getEguneratzeData"+selectQuery);
+//		System.out.println("getEguneratzeData"+selectQuery);
 		Cursor cursor = db.rawQuery(selectQuery, null);
 		if (cursor.moveToFirst()) {
 			return cursor.getString(0);
@@ -238,7 +244,7 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 		return null;
 	}
 
-	public void setEguneratzeData(String naizEguneratzea,String saila) {
+	public void setEguneratzeData(String naizEguneratzea,String saila,int albisteKop) {
 		SQLiteDatabase db = this.getWritableDatabase();
 		
 		String sql = "DELETE FROM "+TABLE_EGUNERAKETA+" WHERE saila='"+saila+"'";
@@ -247,7 +253,8 @@ public class DatabaseHandler extends SQLiteOpenHelper{
  		ContentValues values=new ContentValues();
 		values.put("saila", saila);
 		values.put("date", naizEguneratzea);
-		db.insert("eguneraketa", null,values);
+		values.put("albisteKop", albisteKop);
+		db.insert(TABLE_EGUNERAKETA, null,values);
 	}
 
 	public ArrayList<Saila> selectHerriak(String herrialdea) {
@@ -273,16 +280,84 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 		return HerriList;
 	}
 	public Integer insertHerriak(String herrial,ArrayList<Saila> herriLi) {
-		SQLiteDatabase db = this.getReadableDatabase();
+		SQLiteDatabase db = this.getWritableDatabase();
 		int j=0;
 			for (j=0;j<herriLi.size();j++){
 				ContentValues values=new ContentValues();
 				values.put("herria",herriLi.get(j).getTit());
 				values.put("herrialdea",herrial);
+				values.put("fav",false);
 				db.insert("herriak", null,values);
 				System.out.println("Datu basean herrialde herriak sartzen"+herriLi.get(j).getTit()+" ,"+herriLi.get(j).getTit());
 			}
 
 		return j;
+	}
+
+	public void eguneratuBerria(String html,byte[] media,String link) {
+		SQLiteDatabase db = this.getWritableDatabase();
+		ContentValues values = new ContentValues();
+		values.put("text",html);
+		values.put("media",media);
+		db.update(TABLE_BERRIAK,values, "link='"+link+"'",null );
+		System.out.println("Datu basean update berria");
+	}
+
+	public ArrayList<Saila> getFavHerria() {
+		SQLiteDatabase db = this.getWritableDatabase();
+		ArrayList<Saila> hl=new ArrayList<Saila>();
+		String selectQuery = "SELECT * FROM " + TABLE_HERRIAK+" WHERE fav";
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		if (cursor.moveToFirst()) {
+			do {
+				Saila h=new Saila();
+				h.setTit(cursor.getString(0));
+				h.setLink(cursor.getString(1));
+				hl.add(h);
+			} while (cursor.moveToNext());
+			
+		}
+		System.out.println("getFavHerria "+hl.size());
+		return hl;
+	}
+	public void changeFavHerria(String unekoHerria) {
+		SQLiteDatabase db = this.getWritableDatabase();
+
+		String selectQuery = "SELECT fav FROM " + TABLE_HERRIAK+" WHERE herria='"+unekoHerria+"'";
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		boolean b = false;
+		if (cursor.moveToFirst()) {
+			if(cursor.getInt(0)==1){
+				b=false;
+			}else{
+				b=true;
+			}
+		}
+		ContentValues values = new ContentValues();
+		values.put("fav",b);
+		System.out.println("fav2 :"+b);
+		int i = db.update(TABLE_HERRIAK,values, "herria='"+unekoHerria+"'",null);
+		System.out.println("updateFavHerria"+i+unekoHerria);
+	}	
+	@Override
+	public void onCreate(SQLiteDatabase db) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public boolean isFav(String unekoHerria) {
+		SQLiteDatabase db = this.getReadableDatabase();
+		String selectQuery = "SELECT fav FROM " + TABLE_HERRIAK+" WHERE herria='"+unekoHerria+"'";
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		boolean b = false;
+		if (cursor.moveToFirst()) {
+			if(cursor.getInt(0)==1){
+				b = true;
+			}else{
+				b = false;
+			}
+		}
+		return b;
+		
 	}
 }

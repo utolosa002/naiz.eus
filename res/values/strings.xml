@@ -8,12 +8,17 @@
     <!-- Nav Drawer Menu Items -->
     <string-array name="nav_drawer_items">
         <item >Info</item>
+        <item >Gara</item>
+        <item >Gaur8</item>
+        <item >Kazeta</item>
+        <item >Mediabask</item>
+        <item >Sailak</item>
+        <item >Eguraldia</item>
+        <item >Gogokoak</item>
+        <item >Blogak</item>
         <item >Iritzia</item>
         <item >naiz+</item>
         <item >Agenda</item>
-        <item >Sailak</item>
-        <item >Blogak</item>
-        <item >Eguraldia</item>
         <item >Sartu</item>
     </string-array>
     
@@ -23,21 +28,26 @@
     <item>gipuzkoa</item>
     <item>lapurdi</item>
     <item>nafarroa</item>
-    <item>nafarroa behera</item>
+    <item>nafarroa-beherea</item>
     <item>zuberoa</item>
     </string-array>
     
     <!-- Nav Drawer List Item Icons -->
     <!-- Keep them in order as the titles are in -->
     <array name="nav_drawer_icons">
-        <item>@drawable/ic_home</item>
+        <item>@drawable/ic_launcher</item><!-- naiz -->
+        <item>@drawable/ic_g</item><!-- gara -->
+        <item>@drawable/ic_g8</item><!-- gaur8 -->
+        <item>@drawable/ic_k</item><!-- kazeta -->
+        <item>@drawable/ic_m</item><!-- mediabask -->
+        <item>@drawable/ic_s</item>
+        <item>@drawable/ic_e</item>
+        <item>@drawable/ic_action_favorite</item>
+        <item>@drawable/ic_b</item>
         <item>@drawable/ic_i</item>
         <item>@drawable/ic_n</item>
         <item>@drawable/ic_a</item>
-        <item>@drawable/ic_s</item>
-        <item>@drawable/ic_b</item>
-        <item>@drawable/ic_e</item>
-        <item>@drawable/ic_s</item>
+        <item>@drawable/ic_action_person</item>
     </array>
     
     <!-- Content Description -->
@@ -52,8 +62,11 @@
     <string name="action_previous">Aurrekoa</string>
     <string name="action_next">Hurrengoa</string>
     <string name="action_finish">Amaitu</string>
+    
+    <string name="add_favorites_menu">Gogokoak</string>
     <string name="action_add_fav_item">Gehitu gogokoa</string>
     <string name="action_remove_fav_item">Ezabatu gogokoa</string>
+    <string name="action_refresh">Eguneratu</string>
 
     <string name="appwidget_text_format">
         <xliff:g id="prefix">%1$s</xliff:g>: 

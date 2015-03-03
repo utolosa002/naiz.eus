@@ -12,6 +12,7 @@ private String SailLinka;
 private String Link;
 private String ExtraInfo;
 private String Berria;
+private String Non;
 
 
 	/**
@@ -114,6 +115,14 @@ private String Berria;
 
 	public void setBerria(String berria) {
 		Berria = berria;
+	}
+
+	public String getNon() {
+		return Non;
+	}
+
+	public void setNon(String non) {
+		Non = non;
 	}
 
 }

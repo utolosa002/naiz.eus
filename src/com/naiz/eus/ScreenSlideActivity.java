@@ -54,7 +54,7 @@ public class ScreenSlideActivity extends FragmentActivity {
     /**
      * The number of pages (wizard steps) to show in this demo.
      */
-    private static final int NUM_PAGES = MainActivity.albisteKop;
+    private int NUM_PAGES = MainActivity.albisteKop;
 
 	public static int testutamaina=MainActivity.testutamaina;
 
@@ -129,15 +129,15 @@ public class ScreenSlideActivity extends FragmentActivity {
     	mShareIntent = new Intent();
 		mShareIntent.setAction(Intent.ACTION_SEND);
 		mShareIntent.setType("text/plain");
-		mShareIntent.putExtra(Intent.EXTRA_TEXT,":naiz - "+Linkak.get(pos));
+		mShareIntent.putExtra(Intent.EXTRA_TEXT,"naiz: - "+Linkak.get(pos));
 		startActivity(mShareIntent);
 	return true;
 		case R.id.action_favorites:
-			Intent i = new Intent(this,FavActivity.class);
-//			i.putStringArrayListExtra("Linkak", LinkLista);
-//			i.putExtra("pos", position);
-			startActivity(i);
-			return true;
+//			Intent i = new Intent(this,FavActivity.class);
+////			i.putStringArrayListExtra("Linkak", LinkLista);
+////			i.putExtra("pos", position);
+//			startActivity(i);
+//			return true;
         case R.id.action_login:
 			CharSequence login[] = new CharSequence[] {"naiz:", "google", "facebook", "erregistratu"};
 
@@ -190,10 +190,11 @@ public class ScreenSlideActivity extends FragmentActivity {
 				public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
 					ScreenSlideActivity.testutamaina=progress;
 					MainActivity.testutamaina=progress;
-					if (ScreenSlidePageFragment.Berriatxt!=null){
-						WebSettings settings = ScreenSlidePageFragment.Berriatxt.getSettings();
-		            	settings.setDefaultFontSize(ScreenSlideActivity.testutamaina);
-		            }
+//					FragmentManager ScreenSlidePageFragmen = getFragmentManager();
+//					if (ScreenSlidePageFragment.Berriatxt!=null){
+//						WebSettings settings = ScreenSlidePageFragment.Berriatxt.getSettings();
+//		            	settings.setDefaultFontSize(ScreenSlideActivity.testutamaina);
+//		            }
 		            if(BlogBatFragment.postTxt!=null){
 		            	WebSettings settings = BlogBatFragment.postTxt.getSettings();
 		            	settings.setDefaultFontSize(ScreenSlideActivity.testutamaina);
@@ -225,6 +226,7 @@ public class ScreenSlideActivity extends FragmentActivity {
 	@Override
 	public void onBackPressed() {
 		MainActivity.hasieran=true;
+		MainActivity.herrian=false;
 		super.onBackPressed();
 	}
     /**

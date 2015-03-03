@@ -34,14 +34,15 @@ public class BlogakFragment extends ListFragment implements OnItemClickListener 
 	private String titularra;
 	private TextView TitView;
 
-	public BlogakFragment(){}
+	public BlogakFragment(String url){
+		searchURL=url;
+	}
 	
 	@Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
  
         View rootView = inflater.inflate(R.layout.fragment_blogak, container, false);
-		searchURL = "http://www.naiz.eus/eu/iritzia/blogs";
 		TitView = (TextView) rootView.findViewById(R.id.txtblogak);
 		TitView.setText("blogak kargatzen...");
 		blogLista=new ArrayList<Blog>();
@@ -181,20 +182,19 @@ public class BlogakFragment extends ListFragment implements OnItemClickListener 
 	}
 
 	@Override
-  public void onActivityCreated(Bundle savedInstanceState) {
-      super.onActivityCreated(savedInstanceState);
-  }
+	public void onActivityCreated(Bundle savedInstanceState) {
+		super.onActivityCreated(savedInstanceState);
+	}
 	@Override
-	public void onItemClick(AdapterView<?> parent, View view, int position,
-			long id) {
+	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 		String link = blogLista.get(position).getPostLink();
-		  FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-  	 fragmentManager.beginTransaction()
+		FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+		fragmentManager.beginTransaction()
 		     .replace(R.id.frame_container, BlogBatFragment.newInstance(link))
 		     .commit();
 	}
-	public static Fragment newInstance() {
-		BlogakFragment fragment = new BlogakFragment();
+	public static Fragment newInstance(String url) {
+		BlogakFragment fragment = new BlogakFragment(url);
        return fragment;  
 	}
 	public void setTitle(String titular) {
