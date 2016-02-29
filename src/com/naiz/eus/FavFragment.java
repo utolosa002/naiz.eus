@@ -29,7 +29,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ListView;
 
 public class FavFragment extends ListFragment implements OnItemClickListener {
 	    /**
@@ -44,7 +43,7 @@ public class FavFragment extends ListFragment implements OnItemClickListener {
 		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 			setHasOptionsMenu(true);
 			View rootView = inflater.inflate(R.layout.activity_layout_fav, container, false);
-			ListView lv = (ListView)rootView.findViewById(android.R.id.list);
+		//	ListView lv = (ListView)rootView.findViewById(android.R.id.list);
 				
 			db = new DatabaseHandler(getActivity());
 			try {
@@ -73,6 +72,8 @@ public class FavFragment extends ListFragment implements OnItemClickListener {
 		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 			String link = HerriLista.get(position).getLink();
 			System.out.println("fav klikatua "+link);
+			MainActivity.herrian=true;
+			MainActivity.unekoHerria=HerriLista.get(position).getTit();
 			FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
 			fragmentManager.beginTransaction()
 			     .replace(R.id.frame_container, EguraldiBatFragment.newInstance(link))

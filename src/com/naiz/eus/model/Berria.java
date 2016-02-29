@@ -13,6 +13,7 @@ private String Link;
 private String ExtraInfo;
 private String Berria;
 private String Non;
+private String Iruzkina;
 
 
 	/**
@@ -123,6 +124,14 @@ private String Non;
 
 	public void setNon(String non) {
 		Non = non;
+	}	
+	public void setIruzkina(String Iruzkina) {
+		this.Iruzkina= Iruzkina;
+	}
+
+	public String getIruzkina() {
+		// TODO Auto-generated method stub
+		return Iruzkina;
 	}
 
 }

@@ -70,7 +70,11 @@ public class BlogBatFragment extends Fragment {
 //		postTxt.setWebViewClient(new WebViewClient());
 //		postTxt.setWebChromeClient(new WebChromeClient());
 		postTxt.setBackgroundColor(Color.TRANSPARENT);
-		b.setPostText(b.getPostText().replaceAll("=\"/", "=\"http://www.naiz.eus/"));
+		if (b.getPostText()!=null){
+			b.setPostText(b.getPostText().replaceAll("=\"/", "=\"http://www.naiz.eus/"));
+		}else{
+			b.setPostText(b.getPostText());
+		}
 		//TODO INTENT BERRIA SORTU BERRIAREKIN
 		String html = "<html><body style='text-align:justify;'>"+ b.getPostText()+"</body></html>";
 		postTxt.loadDataWithBaseURL(null,html, "text/html", "utf-8", null);

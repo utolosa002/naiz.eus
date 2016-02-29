@@ -3,19 +3,14 @@ package com.naiz.eus;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
 import com.naiz.eus.R;
-import com.naiz.eus.adapter.BerriaListAdapter;
-import com.naiz.eus.model.Berria;
-import com.naiz.eus.model.NavDrawerItem;
 
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.app.ProgressDialog;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -28,7 +23,6 @@ import android.view.ViewGroup;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 public class WebViewFragment extends Fragment {
@@ -47,9 +41,7 @@ public class WebViewFragment extends Fragment {
 }
 
 	@Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
- 
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_webview, container, false);
 		webView = (WebView) rootView.findViewById(R.id.webView1);
 		titView = (TextView) rootView.findViewById(R.id.txtLabel);
@@ -57,7 +49,6 @@ public class WebViewFragment extends Fragment {
 		URL url = null;
 		thread.execute(url);
         return rootView;
-        
     }
 
 
@@ -79,7 +70,7 @@ public class WebViewFragment extends Fragment {
 		        if (WebViewFragment.this.getActivity() == null)
 	                return;
 		        if (dialog.isShowing()){
-		        dialog.dismiss();
+		        	dialog.dismiss();
 		        }
 		        titView.setText(titulua);
 				WebSettings settings = webView.getSettings();
@@ -90,7 +81,7 @@ public class WebViewFragment extends Fragment {
 		        webView.getSettings().setJavaScriptEnabled(true);
 				webView.setWebViewClient(new WebViewClient());
 
-				 html=html.replaceAll("=\"/", "=\"http://www.naiz.eus/");
+				html=html.replaceAll("=\"/", "=\"http://www.naiz.eus/");
 				webView.loadDataWithBaseURL(null, html, "text/html", "utf-8", null);
 		    }
 		
@@ -115,40 +106,38 @@ public class WebViewFragment extends Fragment {
 		   	 img = BitmapFactory.decodeStream(conn.getInputStream(), new Rect(0, 0, 0, 0), options);
 			 
 			 } catch (IOException e) {
-			 e.printStackTrace();
+				 e.printStackTrace();
 			 }
 	    		Document doc = null;
-	    		 System.out.println("searchURL: "+searchURL);
+	    		System.out.println("searchURL: "+searchURL);
 	    		try {
 	    	   		int k=0;
 	    			while (k<100 && doc==null){
-	    			doc = Jsoup.connect(searchURL).get();
-	    			k++;
+	    				doc = Jsoup.connect(searchURL).get();
+	    				k++;
 	    			}
 	    		
-	    		// Connect to the web site
-	    		Elements izenburua = doc.select("title");
-	    		titulua=izenburua.text();//lista osoaren titulua ezarri
-	    		System.out.println("titulua: "+titulua);
-	//sekzioak bakarrik hautatzeko:
-	           // Elements contain = doc.select("div[id*=content-section]");
-	           // html=contain.outerHtml();
-	    		html=doc.html();
-	            System.out.println("html: "+html);
-          
-  		} catch (IOException e1) {
-  			e1.printStackTrace();
-     			System.out.println("errorea albisteak lortzean");
-     			try {
-  				doInBackground(new URL(null));
-  			} catch (IOException e) {
-  				// TODO Auto-generated catch block
-  				System.out.println("errorea albisteak lortzean2");
-  				e.printStackTrace();
-  			}
-  		}
-			return null;
+	    			// Connect to the web site
+	    			Elements izenburua = doc.select("title");
+	    			titulua=izenburua.text();//lista osoaren titulua ezarri
+	    			System.out.println("titulua: "+titulua);
+	    			//sekzioak bakarrik hautatzeko:
+	    			// Elements contain = doc.select("div[id*=content-section]");
+	    			// html=contain.outerHtml();
+	    			html=doc.html();
+	    			System.out.println("html: "+html);
+	    		} catch (IOException e1) {
+	    			e1.printStackTrace();
+	    			System.out.println("errorea albisteak lortzean");
+	    			try {
+	    				doInBackground(new URL(null));
+	    			} catch (IOException e) {
+	    				// TODO Auto-generated catch block
+	    				System.out.println("errorea albisteak lortzean2");
+	    				e.printStackTrace();
+	    			}
+	    		}
+	    		return null;
 	     }
-	  
 	}
 }

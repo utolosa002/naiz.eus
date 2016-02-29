@@ -6,7 +6,7 @@ import android.content.Intent;
 
 public class PhoneBootCompleteReceiver extends BroadcastReceiver {
     public static boolean wasPhoneBootSucessful = true;//false;
- 
+    
     /**
      * Just changing the boolean value on Phone Boot Complete event one can send
      * custom broadcast from here as well send these broadcast of appwidget
@@ -14,8 +14,8 @@ public class PhoneBootCompleteReceiver extends BroadcastReceiver {
      */
     @Override
     public void onReceive(Context context, Intent intent) {
-    	if (intent.getAction().equals(Intent.ACTION_BOOT_COMPLETED)) {
-        	wasPhoneBootSucessful = true;
+        if (intent.getAction().equals(Intent.ACTION_BOOT_COMPLETED)) {
+            wasPhoneBootSucessful = true;
         }
     }
 }

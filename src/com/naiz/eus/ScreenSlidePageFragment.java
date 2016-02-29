@@ -18,16 +18,15 @@ package com.naiz.eus;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.net.URL;
 import java.text.ParseException;
 import java.util.ArrayList;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import com.naiz.eus.adapter.BerriaListAdapter;
 import com.naiz.eus.db.DatabaseHandler;
 import com.naiz.eus.model.Berria;
 
@@ -36,9 +35,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.Fragment;
-import android.app.FragmentManager;
 import android.database.sqlite.SQLiteException;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -47,17 +44,15 @@ import android.graphics.Rect;
 import android.graphics.Bitmap.CompressFormat;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
 import android.view.animation.DecelerateInterpolator;
-import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 /**
@@ -81,6 +76,7 @@ public class ScreenSlidePageFragment extends Fragment {
 	private String searchURL;
 	private Berria b = new Berria();
 	public WebView Berriatxt;
+	public WebView Iruzkinatxt;
 	public ImageView Irudia;
 
 	/**
@@ -109,8 +105,7 @@ public class ScreenSlidePageFragment extends Fragment {
 		Bundle args = new Bundle();
 		args.putInt(ARG_PAGE, pageNumber);
 
-		System.out.println("SlideSlidePageFrag - create:pageNumber="
-				+ pageNumber);
+		System.out.println("SlideSlidePageFrag - create:pageNumber="+ pageNumber);
 		System.out.println("SlideSlidePageFrag - create:links=" + Links.size());
 
 		args.putStringArrayList(Linkak, Links);
@@ -170,6 +165,7 @@ public class ScreenSlidePageFragment extends Fragment {
 		final TextView Azpitit = (TextView) rootView
 				.findViewById(R.id.textAzpitit);
 		Berriatxt = (WebView) rootView.findViewById(R.id.berriatxt);
+		Iruzkinatxt = (WebView) rootView.findViewById(R.id.iruzkinatxt);
 		final TextView ExtraInfo = (TextView) rootView
 				.findViewById(R.id.textnaiz);
 		final TextView Titularra = (TextView) rootView
@@ -200,12 +196,16 @@ public class ScreenSlidePageFragment extends Fragment {
 			Titularra.setText(b.getTitle());
 			ExtraInfo.setText(b.getExtraInfo());
 			//System.out.println("b.getBerria()0= "+b.getBerria());
+
+			Berriatxt.loadDataWithBaseURL(null, b.getBerria(), "text/html", "utf-8",null);
+			Berriatxt.setBackgroundColor(Color.TRANSPARENT);
+			Iruzkinatxt.loadDataWithBaseURL(null, b.getIruzkina(), "text/html", "utf-8",null);
+			Iruzkinatxt.setBackgroundColor(Color.TRANSPARENT);
 			if (b.getBerria()==null||b.getBerria()==""||b.getBerria()==" "){
-			System.out.println("b.getBerria()1= "+b.getBerria());
-			AsinkTask thread2 = new AsinkTask();
-			URL url = null;
-			thread2.execute(url);
-			
+				System.out.println("b.getBerria() 1= "+b.getBerria().toString());
+				AsinkTask thread2 = new AsinkTask();
+				URL url = null;
+				thread2.execute(url);
 			}else{
 				WebSettings settings = Berriatxt.getSettings();
 				settings.setSupportZoom(false);
@@ -213,12 +213,13 @@ public class ScreenSlidePageFragment extends Fragment {
 				settings.setDefaultTextEncodingName("utf-8");
 				settings.setDefaultFontSize(ScreenSlideActivity.testutamaina);
 				Berriatxt.getSettings().setJavaScriptEnabled(true);
-				Berriatxt.setBackgroundColor(Color.TRANSPARENT);
-			
-				System.out.println("b.getBerria()2= "+b.getBerria().toString());
-				Berriatxt.loadDataWithBaseURL(null, b.getBerria(), "text/html", "utf-8",null);
+				System.out.println("badago getBerria()2 ");
 				// Berria.setText(b.getBerria());
 				Irudia.setImageBitmap(b.getImage());
+			}
+			if (b.getImage()==null){
+				Irudia.setVisibility(View.GONE);
+				System.out.println("Gone");
 			}
 		}
 		return rootView;
@@ -276,7 +277,7 @@ public class ScreenSlidePageFragment extends Fragment {
 			
 			if (b.getBerria() != null) {
 				b.setBerria(b.getBerria().replaceAll("href=\"/", "href=\"http://www.naiz.eus/"));
-				b.setBerria(b.getBerria().replaceAll("src=\"/", "src=\"http://www.naiz.eus/"));
+				b.setBerria(b.getBerria().replaceAll("src=\"/", "width=\"100%\" height=\"auto\" src=\"http://www.naiz.eus/"));
 			} else {
 				b.setBerria("");
 			}
@@ -288,7 +289,20 @@ public class ScreenSlidePageFragment extends Fragment {
 			// Berria.setText(b.getBerria());
 			Irudia.setImageBitmap(b.getImage());
 			}
-
+			////IRUZKIN zatia
+//			if (b.getIruzkina() != null) {
+//				b.setIruzkina(b.getIruzkina().replaceAll("href=\"/", "href=\"http://www.naiz.eus/"));
+//				b.setIruzkina(b.getIruzkina().replaceAll("src=\"/", "src=\"http://www.naiz.eus/"));
+//			} else {
+//				b.setBerria("");
+//			}
+			// TODO INTENT BERRIA SORTU IRUZKINAREKIN
+//			String htmlIruzkina ="<html>"+ b.getIruzkina()+"</html>";
+//
+//			if (ScreenSlidePageFragment.this.isVisible()) {
+//				Iruzkinatxt.loadDataWithBaseURL(null, htmlIruzkina, "text/html", "utf-8",null);
+//			}
+			//////////////////
 			ByteArrayOutputStream stream = new ByteArrayOutputStream();
 			if (b.getImage()!=null){
 				b.getImage().compress(CompressFormat.PNG, 0, stream);
@@ -389,7 +403,24 @@ public class ScreenSlidePageFragment extends Fragment {
 							}
 							b.setSailLinka(weba + produktu_linka);
 						}
-} String html_berria = "";
+					}
+					/// <Iruzkina>
+/*
+					String html_ruzkina = "";
+
+					Element head = doc.head();
+						Elements iruzkinDENA = doc.select("div[class*=widget full_article]");
+						Elements scriptak = iruzkinDENA.select("script");
+						Elements ak = iruzkinDENA.select("a");
+						Element a = ak.last();
+						if (a!=null){
+						System.out.println("iruzkina String:"+head.toString()+"<body>"+a.toString()+scriptak.last().toString()+"</body>");
+						html_ruzkina = head+"<body class=\"actualidad-page\"><div id=\"content-section\"><div class=\"container\"><div id=\"main-content\"><div class=\"span-12\"><div class=\"widget full_article\"><a name='comments'></a><script type=\"text/javascript\">"+scriptak.last().html()+"</script></div></div></div></div></div></body>";}
+						System.out.println("iruzkina:" + html_ruzkina);
+						b.setIruzkina(html_ruzkina);
+		*/				
+					//// </Iruzkina>
+					String html_berria = "";
 						Elements berriaNaiz = doc
 								.select("div[class*=report-text]");
 						Elements berriaGara = doc
@@ -407,6 +438,14 @@ public class ScreenSlidePageFragment extends Fragment {
 						if (html_berria==null||html_berria==""){
 			                Elements erosi = doc.select("div[class*=span-6 last]");
 			                html_berria = erosi.first().outerHtml();
+			                if (html_berria==null||html_berria==""){
+								Elements berriabestetan = doc.select("div[class*=span-5 last]");
+				                html_berria = berriabestetan.first().outerHtml();
+				                if (html_berria==null||html_berria==""){
+									Elements berriabesteta = doc.select("div[class*=last]");
+					                html_berria = berriabesteta.first().outerHtml();
+								}
+							}
 			    		}
 						b.setBerria(html_berria.trim());
 					}

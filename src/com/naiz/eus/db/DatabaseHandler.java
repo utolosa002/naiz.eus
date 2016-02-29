@@ -101,16 +101,16 @@ public class DatabaseHandler extends SQLiteOpenHelper{
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         if ( newVersion > oldVersion)
         {
-        	 System.out.println("New database version exists for upgrade.");         
+        	 System.out.println("New database version exists for upgrade.");
             try {
-               System.out.println("droping upgrade database..."+newVersion+" old:"+oldVersion); 
+               System.out.println("droping upgrade database..."+newVersion+" old:"+oldVersion);
                dropDB();
                System.out.println("Copying upgrade database...");
                copyDataBase();
             } catch (IOException e) {
-            	System.out.println("upgrade database catch..."); 
+            	System.out.println("upgrade database catch...");
                 e.printStackTrace();
-            }       
+            }
         }
     }
 	public ArrayList<Berria> getBerriak(String saila)  throws IOException, SQLiteException {
@@ -129,10 +129,11 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 				Berria.setSaila(cursor.getString(3));
 				if (!(cursor.getString(4).isEmpty())){
 					Berria.setBerria(cursor.getString(4));
-					System.out.println("not empty berria"+cursor.getString(4));
+					System.out.println("not empty berriak" //+cursor.getString(4)); 
+							);
 				}else{
 					Berria.setBerria("");
-					System.out.println("empty berria"+cursor.getString(4));
+					System.out.println("empty berriak"+cursor.getString(4));
 				}
 				Berria.setImage(BitmapFactory.decodeByteArray(cursor.getBlob(5), 0, cursor.getBlob(5).length));
 				Berria.setLink(cursor.getString(6));
@@ -141,9 +142,10 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 				// Adding hondakin to list
 				BerriList.add(Berria);
 				kont++;
-				System.out.println("kont"+kont);
+				System.out.println("berriak kont"+kont);
 			} while (cursor.moveToNext());
 		}
+		cursor.close();
 		System.out.println("berrilist"+BerriList.size());
 		return BerriList;
 	}
@@ -162,17 +164,18 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 				Berria.setSaila(cursor.getString(3));
 				if (!(cursor.getString(4).isEmpty())){
 					Berria.setBerria(cursor.getString(4));
-					System.out.println("not empty berria"+cursor.getString(4));
+					System.out.println("not empty berribat"//+cursor.getString(4));
+							);
 				}else{
 					Berria.setBerria("");
-					System.out.println("empty berria"+cursor.getString(4));
+					System.out.println("empty berribat"+cursor.getString(4));
 				}
 				Berria.setImage(BitmapFactory.decodeByteArray(cursor.getBlob(5), 0, cursor.getBlob(5).length));
 				Berria.setLink(cursor.getString(6));
 				Berria.setSailLinka(cursor.getString(7));
 				Berria.setNon(cursor.getString(8));
 			} while (cursor.moveToNext());
-		}
+		}cursor.close();
 		System.out.println("berrilist"+BerriList.size());
 		return Berria;
 	}
@@ -226,9 +229,9 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 		}
 	}
 
-	public void berriakHustu(String saila) {
+	public void berriakHustu(String saila   ) { //,String data) {
 		SQLiteDatabase db = this.getWritableDatabase();
-		String sql = "DELETE FROM '"+TABLE_BERRIAK+"' WHERE saila='"+saila+"' ";
+		String sql = "DELETE FROM '"+TABLE_BERRIAK+"' WHERE saila='"+saila+"' "; //AND data<>'"+data+"' ";
 		db.execSQL(sql);
 	}
 
@@ -241,6 +244,7 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 		if (cursor.moveToFirst()) {
 			return cursor.getString(0);
 		}
+		cursor.close();
 		return null;
 	}
 
@@ -275,7 +279,7 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 				kont++;
 				System.out.println("SELECT"+herrialdea+"kont"+kont);
 			} while (cursor.moveToNext());
-		}
+		}cursor.close();
 		System.out.println("herriList"+HerriList.size());
 		return HerriList;
 	}
@@ -317,6 +321,7 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 			} while (cursor.moveToNext());
 			
 		}
+		cursor.close();
 		System.out.println("getFavHerria "+hl.size());
 		return hl;
 	}
@@ -332,7 +337,7 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 			}else{
 				b=true;
 			}
-		}
+		}cursor.close();
 		ContentValues values = new ContentValues();
 		values.put("fav",b);
 		System.out.println("fav2 :"+b);
@@ -356,8 +361,31 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 			}else{
 				b = false;
 			}
-		}
+		}cursor.close();
 		return b;
 		
 	}
+
+	public void SartuBerriTxt(String searchURL,String html) {
+		SQLiteDatabase db = this.getWritableDatabase();
+		ContentValues values = new ContentValues();
+		values.put("text",html);
+		db.update(TABLE_BERRIAK,values, "link='"+searchURL+"'",null );
+		System.out.println("Datu basean SartuBerriTxt ");
+	}
+	public boolean BerriTxtBadu(String link) {
+	ArrayList<Berria> BerriList = new ArrayList<Berria>();
+	SQLiteDatabase db = this.getReadableDatabase();
+	String selectQuery = "SELECT * FROM " + TABLE_BERRIAK +" WHERE link='"+link+"'";
+	//System.out.println(selectQuery);
+	Cursor cursor = db.rawQuery(selectQuery, null);
+	if (cursor.moveToFirst()) {
+		do {
+		} while (cursor.moveToNext());
+	}
+	boolean b = cursor.getString(4).isEmpty();
+	cursor.close();
+	System.out.println("SartuBerriTxt: cursor.getString(4).isEmpty()->"+cursor.getString(4).isEmpty());
+	return !b;
+}
 }

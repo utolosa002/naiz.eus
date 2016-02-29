@@ -3,19 +3,14 @@ package com.naiz.eus;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
 import com.naiz.eus.R;
-import com.naiz.eus.adapter.BerriaListAdapter;
-import com.naiz.eus.model.Berria;
-import com.naiz.eus.model.NavDrawerItem;
 
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.app.ProgressDialog;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -28,7 +23,6 @@ import android.view.ViewGroup;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 public class EguraldiBatFragment extends Fragment {
