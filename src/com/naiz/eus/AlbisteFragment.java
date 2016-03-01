@@ -58,6 +58,7 @@ public class AlbisteFragment extends ListFragment implements OnItemClickListener
 	private ProgressBar dialog;
 	private String logoUrl;
 
+
 	public AlbisteFragment() {
 	}
 
@@ -284,6 +285,7 @@ public class AlbisteFragment extends ListFragment implements OnItemClickListener
 			try {
 				imageUrl = new URL(logoUrl);
 				conn = (HttpURLConnection) imageUrl.openConnection();
+				conn.setConnectTimeout(20000);
 				conn.connect();
 				BitmapFactory.Options options = new BitmapFactory.Options();
 				options.inSampleSize = 2; // el factor de escala a minimizar la
@@ -296,7 +298,7 @@ public class AlbisteFragment extends ListFragment implements OnItemClickListener
 			}
 			try {
 				int k = 0;
-				while (k < 30 && doc == null) {
+				while (k < 40 && doc == null) {
 					doc = Jsoup.connect(searchURL).get();
 					k++;
 				}
@@ -348,7 +350,8 @@ public class AlbisteFragment extends ListFragment implements OnItemClickListener
 					if (!AlbisteFragment.this.isVisible()){
 						System.out.println("Stop AsyncTask");
 						this.cancel(true);
-						}
+					}
+					//
 					publishProgress((Integer) ((100 / albisteak.size()) * i));
 					Elements albiste_izenb = albisteak.get(i).select(
 							"div[class*=title]");
@@ -495,5 +498,24 @@ public class AlbisteFragment extends ListFragment implements OnItemClickListener
 			return title.toString();
 		}
 	}
+	
+//	@Override
+//	public void onDestroy() {
+//	    super.onDestroy();
+//	    if (thread != null) {
+//	        if (!thread.isCancelled()) {
+//	        	thread.cancel(true);
+//	        }
+//	    }
+//	}
+//	@Override
+//	public void onPause() {
+//	    super.onPause();
+//	    if (thread != null) {
+//	        if (!thread.isCancelled()) {
+//	        	thread.cancel(true);
+//	        }
+//	    }
+//	}
 
 }

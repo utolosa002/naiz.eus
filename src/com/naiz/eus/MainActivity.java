@@ -34,6 +34,8 @@ import android.database.sqlite.SQLiteCantOpenDatabaseException;
 import android.database.sqlite.SQLiteException;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -240,6 +242,13 @@ public class MainActivity extends FragmentActivity {
 		// Handle action bar actions click
 		switch (item.getItemId()) {
 		case R.id.action_login:
+				if(db.erabIrudiaBadu()){
+					System.out.println(db.erabIrudiaBadu()+" db.erabIrudiaBadu()");
+					byte[] b = db.erabIrudiaLortu();
+					System.out.println(b+" db.erabIrudiaLortu()");
+					Drawable image = new BitmapDrawable(getResources(),BitmapFactory.decodeByteArray(b, 0, b.length));
+					menua.findItem(R.id.action_login).setIcon(image);
+				}
 			AukeratuLoginModua();
 			return true;
 			
@@ -368,6 +377,13 @@ public class MainActivity extends FragmentActivity {
 		// if nav drawer is opened, hide the action items
 		boolean drawerOpen = mDrawerLayout.isDrawerOpen(mDrawerList);
 		menu.findItem(R.id.action_login).setVisible(!drawerOpen);
+		if(db.erabIrudiaBadu()){
+			byte[] b = db.erabIrudiaLortu();
+			Drawable image = new BitmapDrawable(getResources(),BitmapFactory.decodeByteArray(b, 0, b.length));
+			menua.findItem(R.id.action_login).setIcon(image);
+//		}else{
+//			menua.findItem(R.id.action_login).setIcon(R.drawable);
+		}
 		menu.findItem(R.id.action_textsize_seekbar).setVisible(!drawerOpen);
 		menu.findItem(R.id.action_textsize_seekbar).setVisible(!herrian);
 		menu.findItem(R.id.action_add_favorites).setVisible(herrian);

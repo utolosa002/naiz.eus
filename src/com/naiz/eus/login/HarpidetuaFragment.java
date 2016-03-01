@@ -1,17 +1,23 @@
 package com.naiz.eus.login;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
 import com.naiz.eus.AlbisteFragment;
 import com.naiz.eus.MainActivity;
+import com.naiz.eus.NaizFragment;
 import com.naiz.eus.R;
+import com.naiz.eus.db.DatabaseHandler;
 import com.naiz.eus.model.NavDrawerItem;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.database.sqlite.SQLiteException;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -26,6 +32,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 public class HarpidetuaFragment extends Fragment {
+
+	public DatabaseHandler db;
 	public Document doc;
 	public SharedPreferences sharedpreferences;
 	public HarpidetuaFragment() {}
@@ -36,7 +44,16 @@ public class HarpidetuaFragment extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View rootView = inflater.inflate(R.layout.fragment_erab, container, false);
+    	db = new DatabaseHandler(getActivity());
+		try {
+			db.createDataBase();
+			db.close();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+			System.out.println("gaizki db");
+		}
 	    ////LOGIN MENUA EZARRI////
+		
 		SharedPreferences sharedpreferences = getActivity().getSharedPreferences(MainActivity.MyPREFERENCES, Context.MODE_PRIVATE);
 		String defValue = "";
 		String balue="";
@@ -74,9 +91,23 @@ public class HarpidetuaFragment extends Fragment {
 			img = MainActivity.getBitmapFromURL(albiste_irudia);
 		}
 		img = MainActivity.getBitmapFromURL(albiste_irudia);
+		
+		////
+ByteArrayOutputStream stream = new ByteArrayOutputStream();
+img.compress(Bitmap.CompressFormat.PNG, 100, stream);
+byte[] byteArray = stream.toByteArray();
+try {
+	db.erabIrudiaSartu(byteArray);
+} catch (SQLiteException | IOException e) {
+	// TODO Auto-generated catch block
+	e.printStackTrace();
+}
+		/////
+		
+		
 	    profilIcon.setImageBitmap(img);
 	    }
-	    t.setText("Kaixo "+balue+"!\n Saioa hasia duzu ");
+	    t.setText("Kaixo "+balue+"!\n Saioa hasia duzu\n");
 		final OnClickListener logoutListener = new OnClickListener() {
 			public void onClick(View v) {
 				logout(v);
@@ -103,7 +134,7 @@ public class HarpidetuaFragment extends Fragment {
    }
    public void exit(View view){
 	   FragmentManager fragmentManager = getFragmentManager();
-	   AlbisteFragment fragment =new AlbisteFragment();
+	   NaizFragment fragment =new NaizFragment();
 	   fragmentManager.beginTransaction().replace(R.id.frame_container, fragment).commit();
    }
 }

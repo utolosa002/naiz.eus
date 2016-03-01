@@ -29,6 +29,7 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 	// hondakin taulak
     private static final String TABLE_BERRIAK = "berriak";
     private static final String TABLE_HERRIAK = "herriak";
+    private static final String TABLE_ERAB = "erabiltzailea";
     private static final String TABLE_EGUNERAKETA = "eguneraketa";
 	private static final String TABLE_BLOG = "blogak";
     private static final int DB_VERSION = 1;
@@ -374,7 +375,6 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 		System.out.println("Datu basean SartuBerriTxt ");
 	}
 	public boolean BerriTxtBadu(String link) {
-	ArrayList<Berria> BerriList = new ArrayList<Berria>();
 	SQLiteDatabase db = this.getReadableDatabase();
 	String selectQuery = "SELECT * FROM " + TABLE_BERRIAK +" WHERE link='"+link+"'";
 	//System.out.println(selectQuery);
@@ -388,4 +388,47 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 	System.out.println("SartuBerriTxt: cursor.getString(4).isEmpty()->"+cursor.getString(4).isEmpty());
 	return !b;
 }
+
+	public byte[] erabIrudiaLortu() {
+		// TODO Auto-generated method stub
+		SQLiteDatabase db = this.getReadableDatabase();
+		String selectQuery = "SELECT irudia FROM " + TABLE_ERAB;
+		
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		byte[] d = null;
+		if (cursor.moveToFirst()) {
+			do {
+		System.out.println("erabIrudiLortu "+ cursor.getBlob(0));
+		d =cursor.getBlob(0);
+		} while (cursor.moveToNext());
+			}
+		cursor.close();
+		System.out.println("d= "+d);
+		return d;
+	}
+
+	public boolean erabIrudiaBadu() {
+		SQLiteDatabase db = this.getReadableDatabase();
+		String selectQuery = "SELECT irudia FROM " + TABLE_ERAB;
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		boolean b = false;
+		if (cursor.moveToFirst()) {
+			if(cursor.getBlob(0).length!=0){
+				b = true;
+			}else{
+				b = false;
+			}
+		}
+		cursor.close();
+		return b;
+		
+	}
+	public void erabIrudiaSartu(byte[] media) throws IOException,SQLiteException {
+		
+ 		SQLiteDatabase db = this.getWritableDatabase();
+		ContentValues values=new ContentValues();
+		values.put("irudia",media);
+		db.insert(TABLE_ERAB, null,values);
+
+	}
 }
