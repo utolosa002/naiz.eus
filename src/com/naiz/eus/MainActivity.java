@@ -3,6 +3,9 @@ package com.naiz.eus;
 import com.naiz.eus.R;
 import com.naiz.eus.adapter.NavDrawerListAdapter;
 import com.naiz.eus.db.DatabaseHandler;
+import com.naiz.eus.login.FacebookFragment;
+import com.naiz.eus.login.GoogleFragment;
+import com.naiz.eus.login.LoginFragment;
 import com.naiz.eus.model.Berria;
 import com.naiz.eus.model.NavDrawerItem;
 import com.naiz.eus.widget.WidgetProvider;
@@ -21,13 +24,18 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.content.res.TypedArray;
+import android.database.sqlite.SQLiteCantOpenDatabaseException;
 import android.database.sqlite.SQLiteException;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -43,13 +51,12 @@ import android.webkit.WebSettings;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SeekBar;
-import android.widget.Toast;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 
 @SuppressLint("NewApi")//11 api onartzen du, 10 ez
 public class MainActivity extends FragmentActivity {
 	private DrawerLayout mDrawerLayout;
-	private ListView mDrawerList;
+	public static ListView mDrawerList;
 	private ActionBarDrawerToggle mDrawerToggle;
 
 	// nav drawer title
@@ -63,16 +70,17 @@ public class MainActivity extends FragmentActivity {
 	private TypedArray navMenuIcons;
 	public static int albisteKop = 0;
 	public static ArrayList<NavDrawerItem> navDrawerItems;
-	private NavDrawerListAdapter adapter;
+	public static NavDrawerListAdapter adapter;
 	public static String searchURL="http://www.naiz.eus/";
 	public static boolean hasieran;
 	public static boolean herrian=false;
 	public static String saila;
 	public static String unekoHerria="";
 	public static int testutamaina=15;
-	DatabaseHandler db = new DatabaseHandler(this);
+	public DatabaseHandler db = new DatabaseHandler(this);
 	private String img;
 	Menu menua;
+	public static final String MyPREFERENCES = "MyPrefs" ;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -111,10 +119,14 @@ public class MainActivity extends FragmentActivity {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 			System.out.println("gaizki db");
+		}catch (SQLiteCantOpenDatabaseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			System.out.println("gaizki db");
 		}
 		ArrayList<Berria> alb =null;
 		try {
-			alb = db.getBerriak("azala");
+			alb = db.getBerriak("naizazala");
 		} catch (SQLiteException | IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -127,13 +139,13 @@ public class MainActivity extends FragmentActivity {
 		navDrawerItems.add(new NavDrawerItem(navMenuTitles[0], navMenuIcons.getResourceId(0, -1),true, Integer.toString(albkop)));
 		//Gara
 		navDrawerItems.add(new NavDrawerItem(navMenuTitles[1], navMenuIcons.getResourceId(1, -1) ));//, true, "50+"));
+		//info7
+		navDrawerItems.add(new NavDrawerItem(navMenuTitles[2], navMenuIcons.getResourceId(2, -1) ));//, true, "50+"));
 		//Gaur8
-		navDrawerItems.add(new NavDrawerItem(navMenuTitles[2], navMenuIcons.getResourceId(2, -1)));
-		//Kazeta
 		navDrawerItems.add(new NavDrawerItem(navMenuTitles[3], navMenuIcons.getResourceId(3, -1)));
-		//mediabask
+		//Kazeta
 		navDrawerItems.add(new NavDrawerItem(navMenuTitles[4], navMenuIcons.getResourceId(4, -1)));
-		// Sailak
+		//mediabask
 		navDrawerItems.add(new NavDrawerItem(navMenuTitles[5], navMenuIcons.getResourceId(5, -1)));
 		// Eguraldia
 		navDrawerItems.add(new NavDrawerItem(navMenuTitles[6], navMenuIcons.getResourceId(6, -1)));
@@ -148,8 +160,20 @@ public class MainActivity extends FragmentActivity {
 		// Agenda
 		navDrawerItems.add(new NavDrawerItem(navMenuTitles[11], navMenuIcons.getResourceId(11, -1)));
 		// Sartu
+		
+		SharedPreferences sharedpreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
+		String defValue = "";
+		String balue="";
+		balue = sharedpreferences.getString("nameKey", defValue);
+		//Toast.makeText(this.getApplicationContext(), "balue"+balue+"defvaule"+defValue, Toast.LENGTH_SHORT).show();
+		if (balue!=""){
+			if(!(navDrawerItems==null||navDrawerItems.size()==0)){
+				navDrawerItems.add(new NavDrawerItem(navMenuTitles[12], navMenuIcons.getResourceId(12, -1)));
+				navDrawerItems.set(navDrawerItems.size()-1, new NavDrawerItem(balue,  navMenuIcons.getResourceId(12, -1)));
+			}
+		}else{
 		navDrawerItems.add(new NavDrawerItem(navMenuTitles[12], navMenuIcons.getResourceId(12, -1)));
-				
+		}	
 
 		// Recycle the typed array
 		navMenuIcons.recycle();
@@ -218,36 +242,16 @@ public class MainActivity extends FragmentActivity {
 		// Handle action bar actions click
 		switch (item.getItemId()) {
 		case R.id.action_login:
-			CharSequence login[] = new CharSequence[] {"naiz:", "google", "facebook", "erregistratu"};
-
-			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			builder.setTitle("Login");
-			builder.setItems(login, new DialogInterface.OnClickListener() {
-			    @Override
-			    public void onClick(DialogInterface dialog, int which) {
-			    	if (which==0){
-			    	String link6 = "http://www.naiz.eus/eu/suscripcion/entrar";
-					WebViewFragment fragment = new WebViewFragment(link6);
-					//HarpidetzaFragment fragment = new HarpidetzaFragment();
-			    	FragmentManager fragmentManager = getSupportFragmentManager();
-					fragmentManager.beginTransaction()
-							.replace(R.id.frame_container, fragment).commit();
-					}
-			    }
-			});
-			builder.show();
-			
-//			searchURL = "http://www.naiz.eus/eu/suscripcion/entrar";
-//			ThreadClass thread = new ThreadClass(this);
-//			thread.start(); 
-//			//wait for thread to finish
-//			try {
-//				thread.join();
-//			} catch (InterruptedException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
+				if(db.erabIrudiaBadu()){
+					System.out.println(db.erabIrudiaBadu()+" db.erabIrudiaBadu()");
+					byte[] b = db.erabIrudiaLortu();
+					System.out.println(b+" db.erabIrudiaLortu()");
+					Drawable image = new BitmapDrawable(getResources(),BitmapFactory.decodeByteArray(b, 0, b.length));
+					menua.findItem(R.id.action_login).setIcon(image);
+				}
+			AukeratuLoginModua();
 			return true;
+			
 		case R.id.action_textsize_seekbar:
 			AlertDialog.Builder builder2 = new AlertDialog.Builder(this);
 			LayoutInflater inflater = MainActivity.this.getLayoutInflater();
@@ -301,14 +305,15 @@ public class MainActivity extends FragmentActivity {
 				System.out.println("gaizki db");
 			}
 			try {
-				db.setEguneratzeData("2015-00-00 00.00",saila,MainActivity.albisteKop);
+				db.setEguneratzeData("2015-01-01 00.00",saila,MainActivity.albisteKop);
 			} catch (SQLiteException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			AlbisteFragment fragment = new AlbisteFragment(saila, searchURL,img);
-			if (saila=="azala"){
-        	hasieran=true;}
+			if (saila=="naizazala"){
+        	hasieran=true;
+        	}
         	if (fragment != null) {
 				FragmentManager fragmentManager = getSupportFragmentManager();
 				fragmentManager.beginTransaction().replace(R.id.frame_container, fragment).commit();
@@ -316,6 +321,51 @@ public class MainActivity extends FragmentActivity {
 				return true;
 		default:
 			return super.onOptionsItemSelected(item);
+		}
+	}
+
+	private void AukeratuLoginModua() {
+		// TODO Auto-generated method stub
+		SharedPreferences sharedpreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
+		String defValue = "";
+		String balue="";
+		balue = sharedpreferences.getString("nameKey", defValue);
+		if (balue==""){
+		CharSequence login[] = new CharSequence[] {"naiz:", "Google", "Facebook", "Erregistratu"};
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle("Hasi saioa:");
+		builder.setItems(login, new DialogInterface.OnClickListener() {
+		    @Override
+		    public void onClick(DialogInterface dialog, int which) {
+		    	if (which==0){
+//			    	String link6 = "http://www.naiz.eus/eu/suscripcion/entrar";
+//					WebViewFragment fragment = new WebViewFragment(link6);
+					LoginFragment fragment = new LoginFragment();
+			    	FragmentManager fragmentManager = getSupportFragmentManager();
+					fragmentManager.beginTransaction().replace(R.id.frame_container, fragment).commit();
+		    	}else if (which==1){
+					GoogleFragment fragment = new GoogleFragment();
+				    FragmentManager fragmentManager = getSupportFragmentManager();
+					fragmentManager.beginTransaction().replace(R.id.frame_container, fragment).commit();
+				}else if (which==2){
+					FacebookFragment fragment = new FacebookFragment();
+				    FragmentManager fragmentManager = getSupportFragmentManager();
+					fragmentManager.beginTransaction().replace(R.id.frame_container, fragment).commit();
+				}else{
+			    	String link6 = "https://www.naiz.eus/eu/suscripcion/registro";
+					WebViewFragment fragment = new WebViewFragment(link6);
+					//ErregistratuFragment fragment = new ErregistratuFragment();
+					FragmentManager fragmentManager = getSupportFragmentManager();
+					fragmentManager.beginTransaction().replace(R.id.frame_container, fragment).commit();
+				}
+			}
+		});
+		builder.show();
+		}else{
+			LoginFragment fragment = new LoginFragment();
+	    	FragmentManager fragmentManager = getSupportFragmentManager();
+			fragmentManager.beginTransaction().replace(R.id.frame_container, fragment).commit();
 		}
 	}
 
@@ -327,6 +377,13 @@ public class MainActivity extends FragmentActivity {
 		// if nav drawer is opened, hide the action items
 		boolean drawerOpen = mDrawerLayout.isDrawerOpen(mDrawerList);
 		menu.findItem(R.id.action_login).setVisible(!drawerOpen);
+		if(db.erabIrudiaBadu()){
+			byte[] b = db.erabIrudiaLortu();
+			Drawable image = new BitmapDrawable(getResources(),BitmapFactory.decodeByteArray(b, 0, b.length));
+			menua.findItem(R.id.action_login).setIcon(image);
+//		}else{
+//			menua.findItem(R.id.action_login).setIcon(R.drawable);
+		}
 		menu.findItem(R.id.action_textsize_seekbar).setVisible(!drawerOpen);
 		menu.findItem(R.id.action_textsize_seekbar).setVisible(!herrian);
 		menu.findItem(R.id.action_add_favorites).setVisible(herrian);
@@ -347,14 +404,29 @@ public class MainActivity extends FragmentActivity {
 	}
 	@Override
 	public void onBackPressed() {
-		
+		SharedPreferences sharedpreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
+		String defValue = "";
+		String balue="";
+		balue = sharedpreferences.getString("nameKey", defValue);
+		//Toast.makeText(this.getApplicationContext(), "balue"+balue+"defvaule"+defValue, Toast.LENGTH_SHORT).show();
+		if (balue!=""){
+			if(!(navDrawerItems==null||navDrawerItems.size()==0)){
+				navDrawerItems.set(navDrawerItems.size()-1, new NavDrawerItem(balue,  R.drawable.ic_s));
+				
+			}
+		}else{
+			navDrawerItems.set(navDrawerItems.size()-1, new NavDrawerItem("Sartu",  R.drawable.ic_s));
+		}	
+
+		adapter.notifyDataSetChanged();
+        mDrawerList.setAdapter(adapter);
 		if(!hasieran){
 			Fragment fragment;
 			if(herrian){
 				fragment = new EguraldiaFragment();
 				hasieran=false;
 			}else{
-				fragment = new AlbisteFragment();
+				fragment = new NaizFragment();
 				hasieran=true;
 			}
 			if (fragment != null) {
@@ -379,47 +451,48 @@ public class MainActivity extends FragmentActivity {
 //	        	fragment = new LoliAlbisteFragment();
 //	        	hasieran=true;
 //			}else{
-			saila="azala";
+			saila="naizazala";
         	hasieran=true;
-        	herrian = false;
-        	searchURL="http://www.naiz.eus/";
+			herrian = false;
         	img="http://www.naiz.eus/images/logo.png";
-        	fragment = new AlbisteFragment("azala",searchURL,img);
-//			}
-			break;
+        	fragment = new NaizFragment();
+        	break;
 
 		case 1:
 			saila="gara";
         	searchURL="http://www.naiz.eus/hemeroteca/gara";
         	img="http://www.naiz.eus/media/asset_publics/resources/000/037/726/original/GARA_EUS.png";
         	herrian = false;
-        	fragment = new AlbisteFragment("gara",searchURL,img);
+        	fragment = new GaraFragment();
 		break;
 		case 2:
-			saila="gaur8";
+			saila="i7";
+        	searchURL="http://info7.naiz.eus/";
+        	img="http://info7.naiz.eus/media/asset_publics/resources/000/184/514/original/logo_luzea.png";
+        	herrian = false;
+        	fragment = new Info7Fragment();
+		break;
+		case 3:
+			saila="g8";
         	searchURL="http://www.naiz.eus/hemeroteca/gaur8";
         	img="http://www.naiz.eus/media/asset_publics/resources/000/135/174/original/G8.png";
         	herrian = false;
-        	fragment = new AlbisteFragment("gaur8",searchURL,img);
+        	fragment = new Gaur8Fragment();
 		break;
-		case 3:
+		case 4:
 			saila="kazeta";
         	searchURL="http://kazeta.naiz.eus/eu";
         	img="http://kazeta.naiz.eus/media/asset_publics/resources/000/135/205/original/kazeta.png";
         	herrian = false;
-        	fragment = new AlbisteFragment("kazeta",searchURL,img);
+        	fragment = new KazetaFragment();
 		break;
-		case 4:
+		case 5:
 			saila="mediabask";
         	img="http://mediabask.naiz.eus/media/asset_publics/resources/000/135/808/original/logo_mediabask.png";
         	searchURL="http://mediabask.naiz.eus/eu";
         	herrian = false;
-        	fragment = new AlbisteFragment("mediabask",searchURL,img);
+        	fragment = new MediaBaskFragment();
 		break;
-		case 5:
-			herrian = false;
-        	fragment = new SailakFragment();
-			break;
 		case 6:
 			herrian = false;
         	fragment = new EguraldiaFragment();
@@ -448,12 +521,12 @@ public class MainActivity extends FragmentActivity {
         	fragment = new WebViewFragment(link3);
 			break;
 		case 12:
-			String link6 = "http://www.naiz.eus/eu/suscripcion/entrar";
+//			String link6 = "http://www.naiz.eus/eu/suscripcion/entrar";
 			//fragment = new WebViewFragment(link6);
+//        	fragment = new HarpidetzaFragment();
 			herrian = false;
-        	fragment = new HarpidetzaFragment();
+			AukeratuLoginModua();
 			break;
-
 		default:
 			break;
 		}

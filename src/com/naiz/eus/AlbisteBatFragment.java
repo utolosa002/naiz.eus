@@ -1,12 +1,17 @@
 package com.naiz.eus;
 
 import java.io.IOException;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
+
 import com.naiz.eus.R;
+import com.naiz.eus.db.DatabaseHandler;
 import com.naiz.eus.model.Berria;
+
 import android.support.v4.app.Fragment;
+import android.database.sqlite.SQLiteException;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -23,6 +28,7 @@ public class AlbisteBatFragment extends Fragment{
 	private static String searchURL;
 	private Berria b=new Berria();
 	public static WebView Berriatxt;
+	private DatabaseHandler db;
 	public AlbisteBatFragment(){}
 	
 	public AlbisteBatFragment(String link) {
@@ -42,6 +48,14 @@ public class AlbisteBatFragment extends Fragment{
         final TextView Titularra = (TextView) rootView.findViewById(R.id.textTitularra);
         final ImageView Irudia = (ImageView) rootView.findViewById(R.id.berrirudia);
     
+    	db = new DatabaseHandler(getActivity());
+		try {
+			db.createDataBase();
+			db.close();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+			System.out.println("gaizki db");
+		}
         
 		ThreadClass thread = new ThreadClass(this);
 		thread.start(); 
@@ -62,7 +76,7 @@ public class AlbisteBatFragment extends Fragment{
         settings.setBuiltInZoomControls(false);
 		settings.setDefaultTextEncodingName("utf-8");
 		settings.setDefaultFontSize(MainActivity.testutamaina);
-		Berriatxt.getSettings().setJavaScriptEnabled(true);
+	//	Berriatxt.getSettings().setJavaScriptEnabled(true);
 		Berriatxt.setBackgroundColor(Color.TRANSPARENT);
 //		Berriatxt.setWebViewClient(new WebViewClient());
 //		Berriatxt.setWebChromeClient(new WebChromeClient());
@@ -86,6 +100,8 @@ public class AlbisteBatFragment extends Fragment{
 		public void run() {
     		Document doc = null;
     		 System.out.println("searchURL: "+searchURL);
+    		 if (!db.BerriTxtBadu(searchURL)){
+    				System.out.println("AlbistebatFragment: berriak EZ du txt");
     		try {
     			int i=0;
     			while (i<50 && doc==null){
@@ -159,19 +175,32 @@ public class AlbisteBatFragment extends Fragment{
     		String html_berria="";
     		if(berriaNaiz.first()!=null){
     			html_berria = berriaNaiz.first().outerHtml();
+				db.SartuBerriTxt(searchURL,html_berria);
     		}else if(berriaGara.first()!=null){
     			html_berria = berriaGara.first().outerHtml();
+				db.SartuBerriTxt(searchURL,html_berria);
     		}
     		if (html_berria==null||html_berria==""){
                 Elements erosi = doc.select("div[class*=span-6 last]");
                 html_berria = erosi.first().outerHtml();
+				db.SartuBerriTxt(searchURL,html_berria);
     		}
     		b.setBerria(html_berria);
     		}
 	
     		} catch (IOException e1) {
 			e1.printStackTrace();
-		}	
+    		}
+		}else{
+
+			System.out.println("albiste1fragment: Berriak badu txt");
+			try {
+				b=db.getBerria(searchURL);
+			} catch (SQLiteException | IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
     	}
  	}
 

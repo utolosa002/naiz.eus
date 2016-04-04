@@ -2,17 +2,24 @@
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="app_name">naiz:</string>
     <string name="login_menu">Sartu</string>
+    <string name="Login">Sartu</string>
+    <string name="logout">Saioa amaitu</string>
+    <string name="Signin">Erregistratu</string>
+    <string name="Username">Erabiltzailea</string>
+    <string name="Password">Pasahitza</string>
+    <string name="title_activity_welcome">Ongi etorri!</string>
+   <string name="exit">Atzera saioa amaitu gabe</string>
     <string name="favorites_menu">Gogokoak</string>
     <string name="testu_tamaina_tit">Aldatu testu tamaina</string>
     <string name="testsize_menu">Testu tamaina</string>
     <!-- Nav Drawer Menu Items -->
     <string-array name="nav_drawer_items">
-        <item >Info</item>
+        <item >naiz:</item>
         <item >Gara</item>
+        <item >Info7</item>
         <item >Gaur8</item>
         <item >Kazeta</item>
         <item >Mediabask</item>
-        <item >Sailak</item>
         <item >Eguraldia</item>
         <item >Gogokoak</item>
         <item >Blogak</item>
@@ -37,10 +44,10 @@
     <array name="nav_drawer_icons">
         <item>@drawable/ic_launcher</item><!-- naiz -->
         <item>@drawable/ic_g</item><!-- gara -->
+        <item>@drawable/ic_i7</item><!-- info7 -->
         <item>@drawable/ic_g8</item><!-- gaur8 -->
         <item>@drawable/ic_k</item><!-- kazeta -->
         <item>@drawable/ic_m</item><!-- mediabask -->
-        <item>@drawable/ic_s</item>
         <item>@drawable/ic_e</item>
         <item>@drawable/ic_action_favorite</item>
         <item>@drawable/ic_b</item>
@@ -62,6 +69,7 @@
     <string name="action_previous">Aurrekoa</string>
     <string name="action_next">Hurrengoa</string>
     <string name="action_finish">Amaitu</string>
+    <string name="action_settings">Aukerak</string>
     
     <string name="add_favorites_menu">Gogokoak</string>
     <string name="action_add_fav_item">Gehitu gogokoa</string>

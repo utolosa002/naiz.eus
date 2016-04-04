@@ -55,7 +55,7 @@ public class LoremViewsFactory implements RemoteViewsService.RemoteViewsFactory 
 	@Override
 	public void onCreate() {
 
-		Log.i("LoremViewsFactory oncreate", "LOG");
+		Log.i("widget.LoremViewsFactory.oncreate", "LOG");
 		berriLista = new ArrayList<Berria>();
 				//
 		db = new DatabaseHandler(this.ctxt);
@@ -91,7 +91,7 @@ public class LoremViewsFactory implements RemoteViewsService.RemoteViewsFactory 
 
 	@Override
 	public RemoteViews getViewAt(int position) {
-		Log.i("Lorem getViewAt", "LOG");
+		Log.i("widget.LoremViewsFactory.getViewAt position: "+position, "LOG");
 		RemoteViews row = new RemoteViews(ctxt.getPackageName(), R.layout.berria_list_item);
 
 		// row.setTextViewText(R.id.rowprice, items[position]);
@@ -139,7 +139,7 @@ public class LoremViewsFactory implements RemoteViewsService.RemoteViewsFactory 
 	@Override
 	public void onDataSetChanged() {
 
-		Log.i("Lorem onDataSetChanged", "LOG");
+		Log.i("widget.LoremViewsFactory.onDataSetChanged", "LOG");
 		berriLista = new ArrayList<Berria>();
 		ThreadClass thread = new ThreadClass();
 		thread.start();
@@ -171,9 +171,9 @@ public class LoremViewsFactory implements RemoteViewsService.RemoteViewsFactory 
 		}
 		ArrayList<Berria> albisteak = null;
 		try {
-			albisteak = db.getBerriak("azala");
-			dbEguneratzea = db.getEguneratzeData("azala");
-			System.out.println("widget: dbEguneratzea1 "+dbEguneratzea );
+			albisteak = db.getBerriak("naizazala");
+			dbEguneratzea = db.getEguneratzeData("naizazala");
+			System.out.println("widget.LoremViewsFactory.LortuBerriakdb(); dbEguneratzea1 "+dbEguneratzea );
 			if(dbEguneratzea!=null){
 				Date today=new Date();
 				SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd HH.mm");
@@ -225,7 +225,7 @@ public class LoremViewsFactory implements RemoteViewsService.RemoteViewsFactory 
 			}
 		}
 		try {
-			db.berriakHustu("azala");
+			db.berriakHustu("naizazala");
 		} catch (SQLiteException e) {
 			e.printStackTrace();
 		}
@@ -248,24 +248,24 @@ public class LoremViewsFactory implements RemoteViewsService.RemoteViewsFactory 
 
 				if (doc != null) {
 					// Connect to the web site
-					if (titularra == "") {
-						Elements izenburua = doc.select("ul[id*=nav-menu-logo]");
-						Elements titu = izenburua.select("li");
-						titularra = titu.get(0).text();// lista osoaren titulua ezarri
-					}
-					//}
-					String[] titularZatiak = titularra.split(" ");
-					naizEguneratzea = titularZatiak[titularZatiak.length-1];
+					Elements update = doc.select("meta[property*=article:modified_time]");
+					String updated = update.attr("content");// lista osoaren titulua
+					String[] titularZatiak = updated.split("T");
+					String data = titularZatiak[0];
+					String ordua = titularZatiak[titularZatiak.length-1];
+					String[] orduLortua = ordua.split("&#43;");
+					naizEguneratzea = data+orduLortua[0];
 					
-					System.out.println("widget: naizEguneratzea "+naizEguneratzea);
-					System.out.println("widget: dbEguneratzea "+ dbEguneratzea);
+					System.out.println("widget.LoremViewsFactory.thread: naizEguneratzea "+naizEguneratzea);
+					System.out.println("widget.LoremViewsFactory.thread: dbEguneratzea "+ dbEguneratzea);
 					Date today=new Date();
 					SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd");
 					if (naizEguneratzea == "" || naizEguneratzea == null){
 						naizEguneratzea = "2015-01-01 00.01";
-					}else{
-						naizEguneratzea = ft.format(today) + " " + naizEguneratzea;
 					}
+//					else{
+//						naizEguneratzea = ft.format(today) + " " + naizEguneratzea;
+//					}
 					//System.out.println("Current Date: " + ft.format(today));
 					int s = dbEguneratzea.compareTo(naizEguneratzea);
 					System.out.println("s: "+s+" dbEguneratzea:"+dbEguneratzea+" naizEguneratzea"+naizEguneratzea);
@@ -275,7 +275,7 @@ public class LoremViewsFactory implements RemoteViewsService.RemoteViewsFactory 
 						berriTaulaHustu();
 				Elements produktuak = doc.select("div.article");
 				MainActivity.albisteKop=(produktuak.size());
-				db.setEguneratzeData(naizEguneratzea,"azala",produktuak.size());
+				db.setEguneratzeData(naizEguneratzea,"naizazala",produktuak.size());
 				for (int i = 0; i < produktuak.size(); i++) {
 					Elements produktu_izenb = produktuak.get(i).select(
 							"div[class*=title]");
@@ -360,19 +360,19 @@ public class LoremViewsFactory implements RemoteViewsService.RemoteViewsFactory 
 					 }
 					try {
 						System.out.println("widget: db.SartuBerriaOK: "+p.getTitle());
-						db.SartuBerria("azala",text_p_izena, text_albiste_desk, Info, text_albiste_saila, "", stream.toByteArray(), p.getLink(),p.getSailLinka());
+						db.SartuBerria("naizazala",text_p_izena, text_albiste_desk, Info, text_albiste_saila, "", stream.toByteArray(), p.getLink(),p.getSailLinka());
 					} catch (SQLiteException e) {
-						System.out.println("db.SartuBerria1: "+e.getMessage());
+						System.out.println("db.SartuBerria1 e: "+e.getMessage());
 						e.printStackTrace();
-					} catch (IOException e) {
-						System.out.println("db.SartuBerria2: "+e.getMessage());
-						e.printStackTrace();
+					} catch (IOException e1) {
+						System.out.println("db.SartuBerria2 e1: "+e1.getMessage());
+						e1.printStackTrace();
 					}
 				}
 					}
 					}
-			} catch (IOException e1) {
-				e1.printStackTrace();
+			} catch (IOException e2) {
+				e2.printStackTrace();
 			}
 		}
 	}

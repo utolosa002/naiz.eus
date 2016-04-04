@@ -53,7 +53,8 @@
             android:layout_height="match_parent"
             android:layout_weight="0.5"
             android:maxWidth="40dp"
-            android:src="@drawable/ic_b" />
+            android:src="@drawable/ic_b"
+            android:scaleType="centerCrop" />
 
     </LinearLayout>
             <TextView

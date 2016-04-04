@@ -25,7 +25,9 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.ListFragment;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteException;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -43,31 +45,48 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 public class AlbisteFragment extends ListFragment implements OnItemClickListener {
+	
 	private String searchURL = "http://www.naiz.eus/";
 	public ArrayList<Berria> berriLista;
 	public ArrayList<Berria> berriLista2;
 	public ArrayList<String> LinkLista;
 	private String titularra = "";
+	private String saila;
 	private ImageView logoa;
 	private TextView TitView;
 	private DatabaseHandler db;
 	private ProgressBar dialog;
-	private String non;
 	private String logoUrl;
+
 
 	public AlbisteFragment() {
 	}
 
 	public AlbisteFragment(String tit, String link,String img) {
 		titularra = tit;
+		saila=tit;
 		searchURL = link;
-		non = tit;
 		logoUrl=img;
 		
 	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		////LOGIN MENUA EZARRI////
+		SharedPreferences sharedpreferences = getActivity().getSharedPreferences(MainActivity.MyPREFERENCES, Context.MODE_PRIVATE);
+		String defValue = "";
+		String balue="";
+		balue = sharedpreferences.getString("nameKey", defValue);
+		if (balue!=""){
+			if(!(MainActivity.navDrawerItems==null||MainActivity.navDrawerItems.size()==0)){
+				MainActivity.navDrawerItems.set(MainActivity.navDrawerItems.size()-1, new NavDrawerItem(balue, R.drawable.ic_action_person));
+			}
+		}else{
+			MainActivity.navDrawerItems.set(MainActivity.navDrawerItems.size()-1, new NavDrawerItem("Sartu", R.drawable.ic_action_person));
+		}
+		MainActivity.adapter.notifyDataSetChanged();
+		MainActivity.mDrawerList.setAdapter(MainActivity.adapter);
+		////////
 		MainActivity.hasieran = true;
 		View rootView;
 		rootView = inflater.inflate(R.layout.fragment_albiste, container, false);
@@ -123,11 +142,29 @@ public class AlbisteFragment extends ListFragment implements OnItemClickListener
 			
 			FragmentManager fm = getFragmentManager();
 			if (AlbisteFragment.this.isVisible()) {
-				AlbisteFragment fragment = (AlbisteFragment) fm
-						.findFragmentById(R.id.frame_container);
-				if (fragment.isVisible()) {
-					fragment.setTextInTextView(img, titularra);
+				try{
+					AlbisteFragment fragment = (AlbisteFragment) fm.findFragmentById(R.id.frame_container);
+					if(fragment!=null){
+						if (fragment.isVisible()) {
+							fragment.setTextInTextView(img, titularra);
+						}
+					}
+				}catch(ClassCastException e){
+					if (saila.startsWith("i7")){
+						Info7Fragment fragment = (Info7Fragment) fm.findFragmentById(R.id.frame_container);
+					}else if (saila.startsWith("g8")){
+						Gaur8Fragment fragment = (Gaur8Fragment) fm.findFragmentById(R.id.frame_container);
+					}else if (saila.startsWith("gara")){
+						GaraFragment fragment = (GaraFragment) fm.findFragmentById(R.id.frame_container);
+					}else if (saila.startsWith("kazeta")){
+						KazetaFragment fragment = (KazetaFragment) fm.findFragmentById(R.id.frame_container);
+					}else if (saila.startsWith("mediabask")){
+						MediaBaskFragment fragment = (MediaBaskFragment) fm.findFragmentById(R.id.frame_container);
+					}else if (saila.startsWith("naiz")){
+						NaizFragment fragment = (NaizFragment) fm.findFragmentById(R.id.frame_container);
+					}
 				}
+
 			}
 		}
 
@@ -185,13 +222,17 @@ public class AlbisteFragment extends ListFragment implements OnItemClickListener
 			}
 			ArrayList<Berria> albisteak = null;
 			try {
-				albisteak = db.getBerriak(non);
-				dbEguneratzea = db.getEguneratzeData(non);
+				albisteak = db.getBerriak(saila);
+				dbEguneratzea = db.getEguneratzeData(saila);
 				//System.out.println("dbEguneratzea1 "+dbEguneratzea );
-				if(dbEguneratzea!=null){
+				if(dbEguneratzea!=""&& dbEguneratzea!=null){
 					Date today=new Date();
-					SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd HH.mm");
-					int aurreratua = dbEguneratzea.compareTo(ft.format(today));
+					SimpleDateFormat formatuEguna = new SimpleDateFormat ("yyyy-MM-dd");
+					SimpleDateFormat formatuOrdua = new SimpleDateFormat ("HH:mm");
+					String orainEguna = formatuEguna.format(today);
+					String orainOrdua = formatuOrdua.format(today);
+					String konparatzekoGaurkoData = orainEguna+" "+orainOrdua+":00";
+					int aurreratua = dbEguneratzea.compareTo(konparatzekoGaurkoData);
 					//System.out.println("aurreratua1 "+aurreratua  );
 					if (aurreratua>0){//ondo>
 						String sEguna = dbEguneratzea.substring(8, 10);
@@ -208,7 +249,7 @@ public class AlbisteFragment extends ListFragment implements OnItemClickListener
 					}
 				}else{
 					//db.setEguneratzeData("2015-01-01 00.00",saila);
-					dbEguneratzea="2015-01-01 00.00";
+					dbEguneratzea="2015-01-01 00:00:00";
 				}
 			} catch (SQLiteException e) {
 				e.printStackTrace();
@@ -237,31 +278,32 @@ public class AlbisteFragment extends ListFragment implements OnItemClickListener
 				}
 			}
 			try {
-				db.berriakHustu(non);
+				db.berriakHustu(saila);
 			} catch (SQLiteException e) {
 				e.printStackTrace();
 			}
 		}
-
 		private void lortuBerriakInternet() {
 			URL imageUrl = null;
 			HttpURLConnection conn = null;
-			try {
-				imageUrl = new URL(logoUrl);
-				conn = (HttpURLConnection) imageUrl.openConnection();
-				conn.connect();
-				BitmapFactory.Options options = new BitmapFactory.Options();
-				options.inSampleSize = 2; // el factor de escala a minimizar la
+			if(logoUrl!=null){
+				try {
+					imageUrl = new URL(logoUrl);
+					conn = (HttpURLConnection) imageUrl.openConnection();
+					conn.setConnectTimeout(20000);
+					conn.connect();
+					BitmapFactory.Options options = new BitmapFactory.Options();
+					options.inSampleSize = 2; // el factor de escala a minimizar la
 											// imagen, siempre es potencia de 2
-				img = BitmapFactory.decodeStream(conn.getInputStream(),
+					img = BitmapFactory.decodeStream(conn.getInputStream(),
 						new Rect(0, 0, 0, 0), options);
-
-			} catch (IOException e) {
-				e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 			try {
 				int k = 0;
-				while (k < 30 && doc == null) {
+				while (k < 40 && doc == null) {
 					doc = Jsoup.connect(searchURL).get();
 					k++;
 				}
@@ -270,35 +312,36 @@ public class AlbisteFragment extends ListFragment implements OnItemClickListener
 			}
 			if (doc != null) {
 				// Connect to the web site
-				//if (titularra == "") {
-					Elements izenburua = doc.select("ul[id*=nav-menu-logo]");
-					Elements titu = izenburua.select("li");
-					titularra = titu.get(0).text();// lista osoaren titulua
-													// ezarri
-				//}
-				String[] titularZatiak = titularra.split(" ");
-				naizEguneratzea = titularZatiak[titularZatiak.length-1];
+				Elements update = doc.select("meta[property*=article:modified_time]");
+				String updated = update.attr("content");// lista osoaren titulua
+				String[] titularZatiak = updated.split("T");
+				String data = titularZatiak[0];
+				String ordua = titularZatiak[titularZatiak.length-1];
+				String[] orduLortua = ordua.split("&#43;");
+				naizEguneratzea = data+orduLortua[0];
 				
-				System.out.println("naizEguneratzea "+naizEguneratzea);
+				System.out.println("naizEguneratzeaSplit "+naizEguneratzea);
 				System.out.println("dbEguneratzea "+ dbEguneratzea);
 				Date today=new Date();
 				SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd");
 				if (naizEguneratzea == "" || naizEguneratzea == null){
-					naizEguneratzea = "2015-01-01 00.01";
-				}else{
-					naizEguneratzea = ft.format(today) + " " + naizEguneratzea;
+					naizEguneratzea = "2015-01-01 00:02:00";
 				}
+//					else{
+//					
+//
+//					naizEguneratzea = ft.format(today) + " " + naizEguneratzea;
+//				}
 				//System.out.println("Current Date: " + ft.format(today));
 				int s = dbEguneratzea.compareTo(naizEguneratzea);
-				System.out.println("s: "+s+" dbEguneratzea:"+dbEguneratzea+" naizEguneratzea"+naizEguneratzea);
+				System.out.println("s: "+s+". dbEguneratzea:"+dbEguneratzea+". NaizEguneratzea: "+naizEguneratzea);
 				
 				if(s<0){
 					System.out.println("sBARRU: "+s+" dbEguneratzea:"+dbEguneratzea+" naizEguneratzea"+naizEguneratzea);
 					eguneratuBeharra=true;
-					
 					berriTaulaHustu();
 				Elements albisteak = doc.select("div.article");
-				db.setEguneratzeData(naizEguneratzea,non,albisteak.size());
+				db.setEguneratzeData(naizEguneratzea,saila,albisteak.size());
 				//TODO menuan kopurua ezarri
 //				MainActivity.albisteKop = albisteak.size();
 //				if (AlbisteFragment.this.isVisible()) {
@@ -310,6 +353,12 @@ public class AlbisteFragment extends ListFragment implements OnItemClickListener
 //				}
 
 				for (int i = 0; i < albisteak.size(); i++) {
+					//AsyncTask gelditzeko
+					if (!AlbisteFragment.this.isVisible()){
+						System.out.println("Stop AsyncTask");
+						this.cancel(true);
+					}
+					//
 					publishProgress((Integer) ((100 / albisteak.size()) * i));
 					Elements albiste_izenb = albisteak.get(i).select(
 							"div[class*=title]");
@@ -351,13 +400,16 @@ public class AlbisteFragment extends ListFragment implements OnItemClickListener
 						if (albiste_irudia.startsWith("/")) {
 							albiste_irudia = "http://www.naiz.eus"
 									+ albiste_irudia;
-						}
+						}if (!(albiste_irudia==null)||!(albiste_irudia=="")){
 						Bitmap bm = MainActivity.getBitmapFromURL(albiste_irudia);
 						p.setImage(bm);
+						}
 					}
-					Bitmap bm = MainActivity.getBitmapFromURL(albiste_irudia);
+					Bitmap bm = null;
+					if (!(albiste_irudia==null)||!(albiste_irudia=="")){
+					bm = MainActivity.getBitmapFromURL(albiste_irudia);
 					p.setImage(bm);
-
+					}
 					String Info = albiste_info.text();
 					p.setExtraInfo(Info);
 
@@ -387,13 +439,10 @@ public class AlbisteFragment extends ListFragment implements OnItemClickListener
 					 bm.compress(CompressFormat.PNG, 0, stream);
 					 }
 					try {
-						System.out.println("db.SartuBerriaOK: non: "+non+", "+p.getTitle());
-						db.SartuBerria(non,text_a_izena, text_albiste_desk, Info, text_albiste_saila, "", stream.toByteArray(), p.getLink(),p.getSailLinka());
-					} catch (SQLiteException e) {
-						System.out.println("db.SartuBerria1: "+e.getMessage());
-						e.printStackTrace();
-					} catch (IOException e) {
-						System.out.println("db.SartuBerria2: "+e.getMessage());
+						System.out.println("albisteFragmet.java db.SartuBerriaOK: non/saila: "+saila+", "+p.getTitle());
+						db.SartuBerria(saila,text_a_izena, text_albiste_desk, Info, text_albiste_saila, "", stream.toByteArray(), p.getLink(),p.getSailLinka());
+					} catch (SQLiteException | IllegalStateException|IOException e) {
+						System.out.println("execption: albisteFragmet.java db.SartuBerria1: "+e.getMessage());
 						e.printStackTrace();
 					}
 					// System.out.println("linka: "+p.getLink()+" desk: "+p.getSubtitle()+" irudia: "+albiste_irudia+" saila:"+p.getSaila());
@@ -456,5 +505,24 @@ public class AlbisteFragment extends ListFragment implements OnItemClickListener
 			return title.toString();
 		}
 	}
+	
+//	@Override
+//	public void onDestroy() {
+//	    super.onDestroy();
+//	    if (thread != null) {
+//	        if (!thread.isCancelled()) {
+//	        	thread.cancel(true);
+//	        }
+//	    }
+//	}
+//	@Override
+//	public void onPause() {
+//	    super.onPause();
+//	    if (thread != null) {
+//	        if (!thread.isCancelled()) {
+//	        	thread.cancel(true);
+//	        }
+//	    }
+//	}
 
 }

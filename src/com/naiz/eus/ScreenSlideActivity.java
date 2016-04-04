@@ -217,6 +217,10 @@ public class ScreenSlideActivity extends FragmentActivity {
             case R.id.action_next:
                 // Advance to the next step in the wizard. If there is no next step, setCurrentItem
                 // will do nothing.
+            	if((mPager.getCurrentItem() == mPagerAdapter.getCount() - 1)){
+            		 super.onBackPressed();
+            		 return false;
+            	}
                 mPager.setCurrentItem(mPager.getCurrentItem() + 1);
                 return true;
         }
@@ -244,8 +248,10 @@ public class ScreenSlideActivity extends FragmentActivity {
         	System.out.println("SlideActivity - getItem:position="+position);
         	if (Linkak.size()<position){
         		position=Linkak.size();
-        	}
+        	}else{
             return ScreenSlidePageFragment.create(position,Linkak);
+            }
+			return null;
         }
 
         @Override
