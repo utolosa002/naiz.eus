@@ -150,19 +150,19 @@ public class AlbisteFragment extends ListFragment implements OnItemClickListener
 						}
 					}
 				}catch(ClassCastException e){
-//					if (saila.startsWith("i7")){
-//						Info7Fragment fragment = (Info7Fragment) fm.findFragmentById(R.id.frame_container);
-//					}else if (saila.startsWith("g8")){
-//						Gaur8Fragment fragment = (Gaur8Fragment) fm.findFragmentById(R.id.frame_container);
-//					}else if (saila.startsWith("gara")){
-//						GaraFragment fragment = (GaraFragment) fm.findFragmentById(R.id.frame_container);
-//					}else if (saila.startsWith("kazeta")){
-//						KazetaFragment fragment = (KazetaFragment) fm.findFragmentById(R.id.frame_container);
-//					}else if (saila.startsWith("mediabask")){
-//						MediaBaskFragment fragment = (MediaBaskFragment) fm.findFragmentById(R.id.frame_container);
-//					}else if (saila.startsWith("naiz")){
-//						NaizFragment fragment = (NaizFragment) fm.findFragmentById(R.id.frame_container);
-//					}
+					if (saila.startsWith("i7")){
+						Info7Fragment fragment = (Info7Fragment) fm.findFragmentById(R.id.frame_container);
+					}else if (saila.startsWith("g8")){
+						Gaur8Fragment fragment = (Gaur8Fragment) fm.findFragmentById(R.id.frame_container);
+					}else if (saila.startsWith("gara")){
+						GaraFragment fragment = (GaraFragment) fm.findFragmentById(R.id.frame_container);
+					}else if (saila.startsWith("kazeta")){
+						KazetaFragment fragment = (KazetaFragment) fm.findFragmentById(R.id.frame_container);
+					}else if (saila.startsWith("mediabask")){
+						MediaBaskFragment fragment = (MediaBaskFragment) fm.findFragmentById(R.id.frame_container);
+					}else if (saila.startsWith("naiz")){
+						NaizFragment fragment = (NaizFragment) fm.findFragmentById(R.id.frame_container);
+					}
 				}
 
 			}
@@ -227,8 +227,12 @@ public class AlbisteFragment extends ListFragment implements OnItemClickListener
 				//System.out.println("dbEguneratzea1 "+dbEguneratzea );
 				if(dbEguneratzea!=""&& dbEguneratzea!=null){
 					Date today=new Date();
-					SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd HH.mm");
-					int aurreratua = dbEguneratzea.compareTo(ft.format(today));
+					SimpleDateFormat formatuEguna = new SimpleDateFormat ("yyyy-MM-dd");
+					SimpleDateFormat formatuOrdua = new SimpleDateFormat ("HH:mm");
+					String orainEguna = formatuEguna.format(today);
+					String orainOrdua = formatuOrdua.format(today);
+					String konparatzekoGaurkoData = orainEguna+" "+orainOrdua+":00";
+					int aurreratua = dbEguneratzea.compareTo(konparatzekoGaurkoData);
 					//System.out.println("aurreratua1 "+aurreratua  );
 					if (aurreratua>0){//ondo>
 						String sEguna = dbEguneratzea.substring(8, 10);
@@ -245,7 +249,7 @@ public class AlbisteFragment extends ListFragment implements OnItemClickListener
 					}
 				}else{
 					//db.setEguneratzeData("2015-01-01 00.00",saila);
-					dbEguneratzea="2015-01-01 00.00";
+					dbEguneratzea="2015-01-01 00:00:00";
 				}
 			} catch (SQLiteException e) {
 				e.printStackTrace();
@@ -282,19 +286,20 @@ public class AlbisteFragment extends ListFragment implements OnItemClickListener
 		private void lortuBerriakInternet() {
 			URL imageUrl = null;
 			HttpURLConnection conn = null;
-			try {
-				imageUrl = new URL(logoUrl);
-				conn = (HttpURLConnection) imageUrl.openConnection();
-				conn.setConnectTimeout(20000);
-				conn.connect();
-				BitmapFactory.Options options = new BitmapFactory.Options();
-				options.inSampleSize = 2; // el factor de escala a minimizar la
+			if(logoUrl!=null){
+				try {
+					imageUrl = new URL(logoUrl);
+					conn = (HttpURLConnection) imageUrl.openConnection();
+					conn.setConnectTimeout(20000);
+					conn.connect();
+					BitmapFactory.Options options = new BitmapFactory.Options();
+					options.inSampleSize = 2; // el factor de escala a minimizar la
 											// imagen, siempre es potencia de 2
-				img = BitmapFactory.decodeStream(conn.getInputStream(),
+					img = BitmapFactory.decodeStream(conn.getInputStream(),
 						new Rect(0, 0, 0, 0), options);
-
-			} catch (IOException e) {
-				e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 			try {
 				int k = 0;
@@ -307,27 +312,29 @@ public class AlbisteFragment extends ListFragment implements OnItemClickListener
 			}
 			if (doc != null) {
 				// Connect to the web site
-				//if (titularra == "") {
-					Elements izenburua = doc.select("ul[id*=nav-menu-logo]");
-					Elements titu = izenburua.select("li");
-					titularra = titu.get(0).text();// lista osoaren titulua
-													// ezarri
-				//}
-				String[] titularZatiak = titularra.split(" ");
-				naizEguneratzea = titularZatiak[titularZatiak.length-1];
+				Elements update = doc.select("meta[property*=article:modified_time]");
+				String updated = update.attr("content");// lista osoaren titulua
+				String[] titularZatiak = updated.split("T");
+				String data = titularZatiak[0];
+				String ordua = titularZatiak[titularZatiak.length-1];
+				String[] orduLortua = ordua.split("&#43;");
+				naizEguneratzea = data+orduLortua[0];
 				
-				System.out.println("naizEguneratzea "+naizEguneratzea);
+				System.out.println("naizEguneratzeaSplit "+naizEguneratzea);
 				System.out.println("dbEguneratzea "+ dbEguneratzea);
 				Date today=new Date();
 				SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd");
 				if (naizEguneratzea == "" || naizEguneratzea == null){
-					naizEguneratzea = "2015-01-01 00.02";
-				}else{
-					naizEguneratzea = ft.format(today) + " " + naizEguneratzea;
+					naizEguneratzea = "2015-01-01 00:02:00";
 				}
+//					else{
+//					
+//
+//					naizEguneratzea = ft.format(today) + " " + naizEguneratzea;
+//				}
 				//System.out.println("Current Date: " + ft.format(today));
 				int s = dbEguneratzea.compareTo(naizEguneratzea);
-				System.out.println("s: "+s+" dbEguneratzea:"+dbEguneratzea+" naizEguneratzea"+naizEguneratzea);
+				System.out.println("s: "+s+". dbEguneratzea:"+dbEguneratzea+". NaizEguneratzea: "+naizEguneratzea);
 				
 				if(s<0){
 					System.out.println("sBARRU: "+s+" dbEguneratzea:"+dbEguneratzea+" naizEguneratzea"+naizEguneratzea);

@@ -61,7 +61,6 @@ public class DatabaseHandler extends SQLiteOpenHelper{
     		String myPath = DB_PATH + DB_NAME;
     		System.out.println("checking "+myPath);
     		checkDB = SQLiteDatabase.openDatabase(myPath, null, SQLiteDatabase.OPEN_READWRITE);
- 
     	}catch(SQLiteException e){
     		System.out.println("datu basea ez da existitzen oraindik");
     	}

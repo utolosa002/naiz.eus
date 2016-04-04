@@ -248,14 +248,13 @@ public class LoremViewsFactory implements RemoteViewsService.RemoteViewsFactory 
 
 				if (doc != null) {
 					// Connect to the web site
-					if (titularra == "") {
-						Elements izenburua = doc.select("ul[id*=nav-menu-logo]");
-						Elements titu = izenburua.select("li");
-						titularra = titu.get(0).text();// lista osoaren titulua ezarri
-					}
-					//}
-					String[] titularZatiak = titularra.split(" ");
-					naizEguneratzea = titularZatiak[titularZatiak.length-1];
+					Elements update = doc.select("meta[property*=article:modified_time]");
+					String updated = update.attr("content");// lista osoaren titulua
+					String[] titularZatiak = updated.split("T");
+					String data = titularZatiak[0];
+					String ordua = titularZatiak[titularZatiak.length-1];
+					String[] orduLortua = ordua.split("&#43;");
+					naizEguneratzea = data+orduLortua[0];
 					
 					System.out.println("widget.LoremViewsFactory.thread: naizEguneratzea "+naizEguneratzea);
 					System.out.println("widget.LoremViewsFactory.thread: dbEguneratzea "+ dbEguneratzea);
@@ -263,9 +262,10 @@ public class LoremViewsFactory implements RemoteViewsService.RemoteViewsFactory 
 					SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd");
 					if (naizEguneratzea == "" || naizEguneratzea == null){
 						naizEguneratzea = "2015-01-01 00.01";
-					}else{
-						naizEguneratzea = ft.format(today) + " " + naizEguneratzea;
 					}
+//					else{
+//						naizEguneratzea = ft.format(today) + " " + naizEguneratzea;
+//					}
 					//System.out.println("Current Date: " + ft.format(today));
 					int s = dbEguneratzea.compareTo(naizEguneratzea);
 					System.out.println("s: "+s+" dbEguneratzea:"+dbEguneratzea+" naizEguneratzea"+naizEguneratzea);
