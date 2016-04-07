@@ -133,6 +133,7 @@ public class AlbisteFragment extends ListFragment implements OnItemClickListener
 					String link = berriLista.get(i).getLink();
 					LinkLista.add(i, link);
 				}
+				MainActivity.albisteKop = berriLista.size();
 				adapter = new BerriaListAdapter(getActivity(),berriLista);
 				setListAdapter(adapter);
 			}
@@ -197,8 +198,10 @@ public class AlbisteFragment extends ListFragment implements OnItemClickListener
 				}
 			// ///////////////////////////////////////////
 			}
-			lortuBerriakInternet();
-			dialog.setProgress(100);
+			if(eguneratuBeharra){
+				lortuBerriakInternet();
+				dialog.setProgress(100);
+			}
 			return null;
 		}
 
@@ -226,30 +229,33 @@ public class AlbisteFragment extends ListFragment implements OnItemClickListener
 				dbEguneratzea = db.getEguneratzeData(saila);
 				//System.out.println("dbEguneratzea1 "+dbEguneratzea );
 				if(dbEguneratzea!=""&& dbEguneratzea!=null){
+					
 					Date today=new Date();
 					SimpleDateFormat formatuEguna = new SimpleDateFormat ("yyyy-MM-dd");
 					SimpleDateFormat formatuOrdua = new SimpleDateFormat ("HH:mm");
 					String orainEguna = formatuEguna.format(today);
 					String orainOrdua = formatuOrdua.format(today);
-					String konparatzekoGaurkoData = orainEguna+" "+orainOrdua+":00";
-					int aurreratua = dbEguneratzea.compareTo(konparatzekoGaurkoData);
+					String konparatzekoUnekoData = orainEguna+" "+orainOrdua+":00";
+					int zaharkituaDago = dbEguneratzea.compareTo(konparatzekoUnekoData);
 					//System.out.println("aurreratua1 "+aurreratua  );
-					if (aurreratua>0){//ondo>
-						String sEguna = dbEguneratzea.substring(8, 10);
-						//System.out.println("sEguna1 "+sEguna  );
-						Integer e = Integer.valueOf(sEguna);
-						e--;
-						String se=e.toString();
-						if(e<10){
-							se="0"+se;
-						}
-						//System.out.println("e1 "+e  );
-						dbEguneratzea=dbEguneratzea.substring(0, 8)+se+dbEguneratzea.substring(10,dbEguneratzea.length());
-						//	System.out.println("dbEguneratzea2 "+dbEguneratzea);
+					if (zaharkituaDago<0){
+						eguneratuBeharra=true;
+//						String sEguna = dbEguneratzea.substring(8, 10);
+//						Integer e = Integer.valueOf(sEguna);
+//						e--;
+//						String se=e.toString();
+//						if(e<10){
+//							se="0"+se;
+//						}
+//						dbEguneratzea=dbEguneratzea.substring(0, 8)+se+dbEguneratzea.substring(10,dbEguneratzea.length());
+					}else{
+						eguneratuBeharra=false;
 					}
+					System.out.println("eguneratuBeharra1: "+eguneratuBeharra);
 				}else{
 					//db.setEguneratzeData("2015-01-01 00.00",saila);
-					dbEguneratzea="2015-01-01 00:00:00";
+					eguneratuBeharra=true;
+					dbEguneratzea="2016-00-00 00:00:00";
 				}
 			} catch (SQLiteException e) {
 				e.printStackTrace();
@@ -308,6 +314,11 @@ public class AlbisteFragment extends ListFragment implements OnItemClickListener
 					k++;
 				}
 			} catch (IOException e) {
+				eguneratuBeharra=false;
+				//Exception ondoren berriLista hutsa bazen problem, hutsa geratzen zen pantaila
+				if (berriLista.isEmpty()){
+					lortuBerriakInternet();
+				}
 				e.printStackTrace();
 			}
 			if (doc != null) {
@@ -318,18 +329,18 @@ public class AlbisteFragment extends ListFragment implements OnItemClickListener
 				String data = titularZatiak[0];
 				String ordua = titularZatiak[titularZatiak.length-1];
 				String[] orduLortua = ordua.split("&#43;");
-				naizEguneratzea = data+orduLortua[0];
+				if(data!=null && data!=""){
+				naizEguneratzea = data+" "+orduLortua[0];
+				}
 				
 				System.out.println("naizEguneratzeaSplit "+naizEguneratzea);
 				System.out.println("dbEguneratzea "+ dbEguneratzea);
 				Date today=new Date();
 				SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd");
-				if (naizEguneratzea == "" || naizEguneratzea == null){
-					naizEguneratzea = "2015-01-01 00:02:00";
+				if (naizEguneratzea == "" || naizEguneratzea == " " || naizEguneratzea == null){
+					naizEguneratzea = "2016-00-00 00:00:01";
 				}
 //					else{
-//					
-//
 //					naizEguneratzea = ft.format(today) + " " + naizEguneratzea;
 //				}
 				//System.out.println("Current Date: " + ft.format(today));
@@ -339,6 +350,7 @@ public class AlbisteFragment extends ListFragment implements OnItemClickListener
 				if(s<0){
 					System.out.println("sBARRU: "+s+" dbEguneratzea:"+dbEguneratzea+" naizEguneratzea"+naizEguneratzea);
 					eguneratuBeharra=true;
+					System.out.println("eguneratuBeharra: "+eguneratuBeharra);
 					berriTaulaHustu();
 				Elements albisteak = doc.select("div.article");
 				db.setEguneratzeData(naizEguneratzea,saila,albisteak.size());
@@ -351,14 +363,16 @@ public class AlbisteFragment extends ListFragment implements OnItemClickListener
 //							navMenuTitles[0], R.drawable.ic_launcher, true,
 //							(Integer.toString(albisteak.size()))));
 //				}
-
+				MainActivity.albisteKop = albisteak.size();
 				for (int i = 0; i < albisteak.size(); i++) {
+					
 					//AsyncTask gelditzeko
-					if (!AlbisteFragment.this.isVisible()){
-						System.out.println("Stop AsyncTask");
-						this.cancel(true);
-					}
+//					if (!AlbisteFragment.this.isVisible()){
+//						System.out.println("Stop AsyncTask");
+//						this.cancel(true);
+//					}
 					//
+					
 					publishProgress((Integer) ((100 / albisteak.size()) * i));
 					Elements albiste_izenb = albisteak.get(i).select(
 							"div[class*=title]");
@@ -448,7 +462,11 @@ public class AlbisteFragment extends ListFragment implements OnItemClickListener
 					// System.out.println("linka: "+p.getLink()+" desk: "+p.getSubtitle()+" irudia: "+albiste_irudia+" saila:"+p.getSaila());
 					// Toast.makeText(getActivity().getApplicationContext(),"partido "+spartido,Toast.LENGTH_SHORT).show();
 				}
+				}else{// s>=0 beraz ez da eguneratu behar
+					eguneratuBeharra=false; 
 				}
+			}else{//doc null da, beraz ez da eguneratu behar txuria erakusten duelako
+				//eguneratuBeharra=false;//not works
 			}
 		}
 	}
@@ -473,6 +491,8 @@ public class AlbisteFragment extends ListFragment implements OnItemClickListener
 			Intent i = new Intent(getActivity(), s.activityClass);
 			i.putStringArrayListExtra("Linkak", LinkLista);
 			i.putExtra("pos", position);
+			i.putExtra("kop", berriLista.size());
+			i.putExtra("tam", MainActivity.testutamaina);
 			startActivity(i);
 		}
 	}

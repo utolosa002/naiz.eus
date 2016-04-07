@@ -80,6 +80,8 @@ public class ScreenSlideActivity extends FragmentActivity {
         
         Linkak=getIntent().getExtras().getStringArrayList("Linkak");
         pos = getIntent().getExtras().getInt("pos");
+        NUM_PAGES = getIntent().getExtras().getInt("kop");
+        testutamaina = getIntent().getExtras().getInt("tam");
         
         System.out.println("SlideActivity - onCreate:pos="+pos);
     	System.out.println("SlideActivity - onCreate:linkak.size="+Linkak.size());

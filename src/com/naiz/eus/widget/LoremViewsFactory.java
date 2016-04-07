@@ -171,32 +171,37 @@ public class LoremViewsFactory implements RemoteViewsService.RemoteViewsFactory 
 		}
 		ArrayList<Berria> albisteak = null;
 		try {
-			albisteak = db.getBerriak("naizazala");
-			dbEguneratzea = db.getEguneratzeData("naizazala");
+			albisteak = db.getBerriak("naizwidget");
+			dbEguneratzea = db.getEguneratzeData("naizwidget");
 			System.out.println("widget.LoremViewsFactory.LortuBerriakdb(); dbEguneratzea1 "+dbEguneratzea );
 			if(dbEguneratzea!=null){
 				Date today=new Date();
-				SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd HH.mm");
+				SimpleDateFormat formatuEguna = new SimpleDateFormat ("yyyy-MM-dd");
+				SimpleDateFormat formatuOrdua = new SimpleDateFormat ("HH:mm");
+				String orainEguna = formatuEguna.format(today);
+				String orainOrdua = formatuOrdua.format(today);
+				String konparatzekoGaurkoData = orainEguna+" "+orainOrdua+":00";
+				int aurreratua = dbEguneratzea.compareTo(konparatzekoGaurkoData);
 				
-				int aurreratua = dbEguneratzea.compareTo(ft.format(today));
-				System.out.println("widget: ft.format(today) "+ft.format(today) );
+				System.out.println("widget: konparatzekoGaurkoDat "+konparatzekoGaurkoData );
 				System.out.println("widget: aurreratua1 "+aurreratua  );
 				if (aurreratua>0){//ondo>
-					String sEguna = dbEguneratzea.substring(8, 10);
-					//System.out.println("sEguna1 "+sEguna  );
-					Integer e = Integer.valueOf(sEguna);
-					e--;
-					String se=e.toString();
-					if(e<10){
-						se="0"+se;
-					}
-					//System.out.println("e1 "+e  );
-					dbEguneratzea=dbEguneratzea.substring(0, 8)+se+dbEguneratzea.substring(10,dbEguneratzea.length());
+					eguneratuBeharra=true;
+//					String sEguna = dbEguneratzea.substring(8, 10);
+//					//System.out.println("sEguna1 "+sEguna  );
+//					Integer e = Integer.valueOf(sEguna);
+//					e--;
+//					String se=e.toString();
+//					if(e<10){
+//						se="0"+se;
+//					}
+//					//System.out.println("e1 "+e  );
+//					dbEguneratzea=dbEguneratzea.substring(0, 8)+se+dbEguneratzea.substring(10,dbEguneratzea.length());
 					//	System.out.println("dbEguneratzea2 "+dbEguneratzea);
 				}
 			}else{
 				//db.setEguneratzeData("2015-01-01 00.00",saila);
-				dbEguneratzea="2015-01-01 00.00";
+				dbEguneratzea="2016-01-01 00:00:00";
 			}
 		} catch (SQLiteException e) {
 			e.printStackTrace();
@@ -204,7 +209,7 @@ public class LoremViewsFactory implements RemoteViewsService.RemoteViewsFactory 
 			e.printStackTrace();
 		}
 		if (albisteak != null) {
-			MainActivity.albisteKop = albisteak.size();
+			//MainActivity.albisteKop = albisteak.size();
 			for (int i = 0; i < albisteak.size(); i++) {
 				Berria p = albisteak.get(i);
 				berriLista.add(p);
@@ -225,7 +230,7 @@ public class LoremViewsFactory implements RemoteViewsService.RemoteViewsFactory 
 			}
 		}
 		try {
-			db.berriakHustu("naizazala");
+			db.berriakHustu("naizwidget");
 		} catch (SQLiteException e) {
 			e.printStackTrace();
 		}
@@ -254,14 +259,14 @@ public class LoremViewsFactory implements RemoteViewsService.RemoteViewsFactory 
 					String data = titularZatiak[0];
 					String ordua = titularZatiak[titularZatiak.length-1];
 					String[] orduLortua = ordua.split("&#43;");
-					naizEguneratzea = data+orduLortua[0];
+					naizEguneratzea = data+" "+orduLortua[0];
 					
 					System.out.println("widget.LoremViewsFactory.thread: naizEguneratzea "+naizEguneratzea);
 					System.out.println("widget.LoremViewsFactory.thread: dbEguneratzea "+ dbEguneratzea);
 					Date today=new Date();
 					SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd");
 					if (naizEguneratzea == "" || naizEguneratzea == null){
-						naizEguneratzea = "2015-01-01 00.01";
+						naizEguneratzea = "2016-01-01 00:00:00";
 					}
 //					else{
 //						naizEguneratzea = ft.format(today) + " " + naizEguneratzea;
@@ -275,7 +280,7 @@ public class LoremViewsFactory implements RemoteViewsService.RemoteViewsFactory 
 						berriTaulaHustu();
 				Elements produktuak = doc.select("div.article");
 				MainActivity.albisteKop=(produktuak.size());
-				db.setEguneratzeData(naizEguneratzea,"naizazala",produktuak.size());
+				db.setEguneratzeData(naizEguneratzea,"naizwidget",produktuak.size());
 				for (int i = 0; i < produktuak.size(); i++) {
 					Elements produktu_izenb = produktuak.get(i).select(
 							"div[class*=title]");
@@ -360,7 +365,7 @@ public class LoremViewsFactory implements RemoteViewsService.RemoteViewsFactory 
 					 }
 					try {
 						System.out.println("widget: db.SartuBerriaOK: "+p.getTitle());
-						db.SartuBerria("naizazala",text_p_izena, text_albiste_desk, Info, text_albiste_saila, "", stream.toByteArray(), p.getLink(),p.getSailLinka());
+						db.SartuBerria("naizwidget",text_p_izena, text_albiste_desk, Info, text_albiste_saila, "", stream.toByteArray(), p.getLink(),p.getSailLinka());
 					} catch (SQLiteException e) {
 						System.out.println("db.SartuBerria1 e: "+e.getMessage());
 						e.printStackTrace();

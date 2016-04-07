@@ -424,7 +424,7 @@ public class ScreenSlidePageFragment extends Fragment {
 						Elements berriaNaiz = doc
 								.select("div[class*=report-text]");
 						Elements berriaGara = doc
-								.select("div[class*=ART_BODY]");
+								.select("div[class*=col-sm-6 last]");
 						Elements berriaElkarriz = doc
 								.select("div[class*=new-content]");
 						if (berriaNaiz.first() != null) {
@@ -436,7 +436,7 @@ public class ScreenSlidePageFragment extends Fragment {
 						}
 						//System.out.println("SuSBs aurretik"+html_berria);
 						if (html_berria==null||html_berria==""){
-			                Elements erosi = doc.select("div[class*=span-6 last]");
+			                Elements erosi = doc.select("div[class*=subscription-access]");
 			                html_berria = erosi.first().outerHtml();
 			                if (html_berria==null||html_berria==""){
 								Elements berriabestetan = doc.select("div[class*=span-5 last]");
