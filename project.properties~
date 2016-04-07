@@ -11,7 +11,10 @@
 #proguard.config=${sdk.dir}/tools/proguard/proguard-android.txt:proguard-project.txt
 
 # Project target.
-
+<<<<<<< HEAD
 target=Google Inc.:Google APIs:23
 android.library.reference.1=../google-play-services_lib
+=======
+target=android-23
 android.library.reference.1=../appcompat_v7
+>>>>>>> e9d09d93e37cad2776b57e217ead716dcb0a6762
